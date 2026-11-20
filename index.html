@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BrokeMeter - Advanced Analytics & Forecasting</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Poppins', Arial, sans-serif;
+      background: #f4f5ff;
+      color: #25243a;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #6558e8, #9c63e8, #5542a0);
+      background-size: 200% 200%;
+      animation: gradientShift 12s ease infinite;
+      color: white;
+      text-align: center;
+      padding: 60px 20px 90px;
+      position: relative;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .api-status-banner {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(6px);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #ff4757; position: relative; }
+    .status-dot.online { background: #2ed573; box-shadow: 0 0 10px #2ed573; animation: pulseDot 2s infinite; }
+
+    @keyframes pulseDot {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 213, 115, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(46, 213, 115, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 213, 115, 0); }
+    }
+
+    .logo {
+      font-size: 50px;
+      margin-bottom: 10px;
+      display: inline-block;
+      animation: floatLogo 3s ease-in-out infinite;
+    }
+
+    @keyframes floatLogo {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .tagline { font-size: 12px; font-weight: 600; letter-spacing: 3px; opacity: 0.85; }
+    .hero h1 { font-size: clamp(28px, 5vw, 45px); margin: 15px 0; font-weight: 800; }
+    .subtitle { max-width: 600px; margin: auto; font-size: 14px; line-height: 1.8; opacity: 0.9; }
+
+    .container {
+      width: 90%;
+      max-width: 750px;
+      margin: -45px auto 0;
+      position: relative;
+      padding-bottom: 60px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 8px 30px rgba(45, 39, 100, 0.07);
+      margin-bottom: 24px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(45, 39, 100, 0.1);
+    }
+
+    /* Tiny Help Tooltip Symbol Styling */
+    .help-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 13px;
+      height: 13px;
+      background: #eef2ff;
+      color: #6c5ce7;
+      border-radius: 50%;
+      font-size: 8px;
+      font-weight: 700;
+      cursor: help;
+      margin-left: 4px;
+      position: relative;
+      vertical-align: middle;
+    }
+
+    .help-icon:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #292449;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 400;
+      width: 220px;
+      text-align: left;
+      z-index: 100;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      line-height: 1.4;
+      pointer-events: none;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 24px;
+    }
+
+    .section-heading span { font-size: 32px; }
+    .section-heading h2 { font-size: 19px; }
+    .section-heading p { font-size: 12px; color: #85849a; margin-top: 3px; }
+
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+
+    .form-group input {
+      width: 100%; padding: 13px; border: 1px solid #deddea; border-radius: 10px;
+      font-size: 14px; outline: none; font-family: inherit; transition: all 0.25s ease;
+    }
+    .form-group input:focus {
+      border-color: #7665e8;
+      box-shadow: 0 0 0 4px rgba(118, 101, 232, 0.15);
+      transform: translateY(-1px);
+    }
+    .form-group small { display: block; margin-top: 6px; color: #9291a3; font-size: 11px; }
+
+    .split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    .calculate-btn, .reset-btn {
+      width: 100%; padding: 15px; border: none; border-radius: 10px;
+      font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer; transition: all 0.2s ease;
+    }
+    .calculate-btn { background: #6c5ce7; color: white; margin-top: 8px; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3); }
+    .calculate-btn:hover { background: #5544d1; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(108, 92, 231, 0.4); }
+    .calculate-btn:active { transform: scale(0.98); }
+
+    .results { margin-top: 28px; }
+    .hidden { display: none; }
+
+    .animate-slide-up {
+      animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    @keyframes slideUpFade {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .main-result {
+      background: linear-gradient(135deg, #292449, #5542a0);
+      color: white; padding: 35px 25px; border-radius: 18px; text-align: center;
+      box-shadow: 0 8px 25px rgba(45, 39, 100, 0.12);
+    }
+
+    .danger-pulse {
+      animation: dangerGlow 1.5s infinite alternate;
+    }
+    @keyframes dangerGlow {
+      0% { box-shadow: 0 0 15px rgba(255, 71, 87, 0.3); border: 1px solid rgba(255, 71, 87, 0.4); }
+      100% { box-shadow: 0 0 30px rgba(255, 71, 87, 0.7); border: 1px solid rgba(255, 71, 87, 0.9); }
+    }
+
+    .result-label { font-size: 11px; letter-spacing: 2px; opacity: 0.8; font-weight: 600; }
+    .main-result h2 { font-size: clamp(25px, 5vw, 35px); margin: 15px 0; }
+    #result-message { font-size: 13px; line-height: 1.7; opacity: 0.9; }
+
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 20px 0; }
+    .stat-card { text-align: center; padding: 25px 15px; }
+    .stat-card span { font-size: 28px; }
+    .stat-card p { font-size: 12px; color: #85849a; margin: 10px 0; }
+    .stat-card h3 { font-size: 23px; color: #6656df; }
+
+    .risk-progress-container {
+      width: 100%; background: #e2def8; border-radius: 8px; height: 10px; margin-top: 12px; overflow: hidden;
+    }
+    .risk-progress-bar {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, #2ed573, #ffa502, #ff4757);
+      border-radius: 8px; transition: width 1s cubic-bezier(0.1, 1, 0.1, 1);
+    }
+
+    .budget-highlight {
+      background: #f1efff; border-radius: 12px; padding: 20px; text-align: center; margin: 20px 0;
+    }
+    .budget-highlight p { font-size: 12px; color: #7770a5; }
+    .budget-highlight h3 { font-size: 32px; color: #6558e8; margin-top: 8px; }
+
+    .advice {
+      font-size: 12px;
+      color: #55536f;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .reset-btn { background: #e9e6ff; color: #6558e8; margin-top: 15px; }
+    .reset-btn:hover { background: #dcd7ff; }
+
+    .prediction-list {
+      background: #faf9ff; border: 1px solid #e2def8; border-radius: 14px; padding: 18px; margin-top: 15px;
+    }
+    .prediction-list h3 { font-size: 15px; color: #5542a0; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .prediction-list ul { list-style: none; font-size: 12px; color: #55536f; line-height: 2; }
+    .prediction-list ul li::before { content: "🔹 "; color: #6c5ce7; }
+
+    footer { text-align: center; padding: 35px 10px; color: #77768b; font-size: 12px; line-height: 2; }
+    .footer-small { font-size: 11px; color: #aaa8b9; }
+  </style>
+</head>
+<body>
+
+  <header class="hero">
+    <div id="api-status-banner" class="api-status-banner">
+      <div id="status-dot" class="status-dot"></div>
+      <span id="status-text">Checking Local API...</span>
+    </div>
+
+    <div class="logo">💸</div>
+    <p class="tagline">BROKEMETER - ADVANCED ANALYTICS & FORECASTING</p>
+    <h1>Where Did My Money Go?</h1>
+    <p class="subtitle">
+      Powered by Scikit-Learn Linear Regression (.pkl) model, CSV peer benchmarks, and risk probability scoring.
+    </p>
+  </header>
+
+  <main class="container">
+
+    <!-- Campus Inflation Card -->
+    <section class="card animate-slide-up" style="background: #f0edff; border: 1px solid #7665e8; margin-bottom: 20px; padding: 20px;">
+      <div class="section-heading" style="margin-bottom: 10px;">
+        <span>⚡</span>
+        <div>
+          <h2 style="font-size: 16px; color: #5542a0;">Live Campus Inflation Index <span class="help-icon" data-tooltip="Reflects ongoing cost-of-living adjustments pulled from market trends to keep your budget realistic.">i</span></h2>
+          <p id="campus-inflation-status">Fetching local API index...</p>
+        </div>
+      </div>
+      <p id="campus-inflation-advice" style="font-size: 12px; color: #6558e8; font-weight: 500;"></p>
+    </section>
+
+    <!-- Form Card -->
+    <section class="calculator card animate-slide-up" style="animation-delay: 0.1s;">
+      <div class="section-heading">
+        <span>🧮</span>
+        <div>
+          <h2>Calculate Financial Forecast <span class="help-icon" data-tooltip="Input your monthly numbers to process them through your trained machine learning model.">i</span></h2>
+          <p>Connected directly to local FastAPI (127.0.0.1:8000)</p>
+        </div>
+      </div>
+
+      <form id="budget-form">
+        <div class="form-group">
+          <label for="allowance">Monthly Allowance (₹)</label>
+          <input type="number" id="allowance" placeholder="e.g. 10000" min="0" step="0.01" required>
+        </div>
+
+        <div class="form-group">
+          <label for="bills">Monthly Recurring Bills (₹)</label>
+          <input type="number" id="bills" placeholder="e.g. 3000" min="0" step="0.01" value="0" required>
+          <small>Hostel fees, subscriptions, recharge, mess charges.</small>
+        </div>
+
+        <div class="split-grid">
+          <div class="form-group">
+            <label for="weekday-spending">Weekday Daily Spend (₹)</label>
+            <input type="number" id="weekday-spending" placeholder="e.g. 200" min="0" step="0.01" required>
+            <small>Mon - Fri (Mess, canteen)</small>
+          </div>
+
+          <div class="form-group">
+            <label for="weekend-spending">Weekend Daily Spend (₹)</label>
+            <input type="number" id="weekend-spending" placeholder="e.g. 500" min="0" step="0.01" required>
+            <small>Sat - Sun (Outings, cafes)</small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="start-date">Allowance Received On</label>
+          <input type="date" id="start-date" required>
+        </div>
+
+        <button type="submit" class="calculate-btn">Predict My Financial Doom 🚀</button>
+      </form>
+    </section>
+
+    <!-- Results Section -->
+    <section id="results" class="results hidden" aria-live="polite">
+
+      <div id="main-result-card" class="result-card main-result animate-slide-up">
+        <p class="result-label">YOUR MONEY WILL RUN OUT ON <span class="help-icon" data-tooltip="The exact calendar date your spendable balance is mathematically projected to hit zero based on your daily burn rate.">i</span></p>
+        <h2 id="zero-date">--</h2>
+        <p id="result-message"></p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card card animate-slide-up" style="animation-delay: 0.15s;">
+          <span>💰</span>
+          <p>Spendable Balance <span class="help-icon" data-tooltip="Total allowance remaining after paying your fixed monthly recurring bills.">i</span></p>
+          <h3 id="remaining-money">₹0</h3>
+        </div>
+
+        <div class="stat-card card animate-slide-up" style="animation-delay: 0.2s;">
+          <span>⏳</span>
+          <p>ML Forecasted Days <span class="help-icon" data-tooltip="Total number of survival days predicted by your Scikit-Learn .pkl regression pipeline.">i</span></p>
+          <h3 id="days-left">--</h3>
+        </div>
+      </div>
+
+      <!-- Risk Probability Score Card -->
+      <div class="card animate-slide-up" style="background: #fff9f0; border: 1px solid #f39c12; animation-delay: 0.25s;">
+        <div class="section-heading" style="margin-bottom: 10px;">
+          <span>⚠️</span>
+          <div>
+            <h2 style="font-size: 16px; color: #d35400;">AI Risk Probability Score <span class="help-icon" data-tooltip="Statistical probability percentage of running out of money early, calculated using burn ratio and dataset benchmarks.">i</span></h2>
+            <p>Calculated using regression & burn velocity metrics</p>
+          </div>
+        </div>
+        <h3 id="risk-score-display" style="font-size: 20px; color: #e67e22;">Analyzing...</h3>
+        <p id="risk-percentage-text" style="font-size: 12px; color: #7f8c8d; margin-top: 5px;"></p>
+
+        <div class="risk-progress-container">
+          <div id="risk-bar" class="risk-progress-bar"></div>
+        </div>
+      </div>
+
+      <!-- Peer Rank Card -->
+      <div class="card animate-slide-up" style="background: #eef9f2; border: 1px solid #2ed573; animation-delay: 0.3s;">
+        <div class="section-heading" style="margin-bottom: 10px;">
+          <span>🏆</span>
+          <div>
+            <h2 style="font-size: 16px; color: #1e8449;">Hostel Financial Rank <span class="help-icon" data-tooltip="Your budget tier percentile computed by comparing your allowance against logged student records in your CSV dataset.">i</span></h2>
+            <p>Benchmarked against student spending dataset</p>
+          </div>
+        </div>
+        <h3 id="peer-rank-display" style="font-size: 22px; color: #27ae60;">Calculating...</h3>
+      </div>
+
+      <!-- Survival Card & Prediction List -->
+      <div class="survival-card card animate-slide-up" style="animation-delay: 0.35s;">
+        <h2>🍜 Instant Noodle Survival Plan</h2>
+        <p id="survival-message"></p>
+
+        <div class="budget-highlight">
+          <p>Recommended Safe Daily Budget <span class="help-icon" data-tooltip="The exact maximum amount you can spend per day to safely make your spendable balance last until your next allowance cycle.">i</span></p>
+          <h3 id="recommended-budget">₹0</h3>
+        </div>
+
+        <p id="budget-advice" class="advice"></p>
+
+        <div class="prediction-list">
+          <h3>📊 Regression Prediction Breakdown <span class="help-icon" data-tooltip="Granular mathematical breakdown of your monthly velocity and projected savings surplus or deficit.">i</span></h3>
+          <ul>
+            <li>Estimated monthly total burn velocity: <strong id="pred-monthly-burn">--</strong></li>
+            <li>Recommended maximum weekend outing limit: <strong id="pred-weekend-cap">--</strong></li>
+            <li>Projected month-end cash surplus / deficit: <strong id="pred-surplus-deficit">--</strong></li>
+          </ul>
+        </div>
+      </div>
+
+      <button type="button" id="reset-btn" class="reset-btn">Calculate Again ↻</button>
+    </section>
+
+    <footer>
+      <p>Made for students whose money has a shorter lifespan than a packet of Maggi. 🍜</p>
+      <p class="footer-small">Spend wisely. Survive the semester.</p>
+    </footer>
+
+  </main>
+
+  <script>
+    // Direct local FastAPI URL (works whether served from http://127.0.0.1:8000/ or opened locally)
+    const API_BASE_URL = window.location.protocol.startsWith("http") && window.location.port === "8000"
+      ? window.location.origin
+      : "http://127.0.0.1:8000";
+
+    const statusDot = document.getElementById("status-dot");
+    const statusText = document.getElementById("status-text");
+
+    async function fetchWithTimeout(url, options = {}, timeoutMs = 4000) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        return await fetch(url, { ...options, signal: controller.signal });
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    async function checkApiHealth() {
+      try {
+        const response = await fetchWithTimeout(`${API_BASE_URL}/api/health`);
+        if (response.ok) {
+          const data = await response.json();
+          statusDot.classList.add("online");
+          statusText.textContent = data.model_loaded ? "Local API Online (ML)" : "Local API Online";
+        } else {
+          throw new Error("Non-200 health response");
+        }
+      } catch (err) {
+        statusDot.classList.remove("online");
+        statusText.textContent = "Local API Offline (:8000)";
+      }
+    }
+    checkApiHealth();
+    setInterval(checkApiHealth, 10000);
+
+    async function loadCampusInflation() {
+      try {
+        const response = await fetchWithTimeout(`${API_BASE_URL}/api/campus-inflation`);
+        if (response.ok) {
+          const data = await response.json();
+          document.getElementById("campus-inflation-status").textContent = `Inflation Index: +${data.inflation_percentage}%`;
+          document.getElementById("campus-inflation-advice").textContent = data.advisory;
+        } else {
+          throw new Error("Failed inflation fetch");
+        }
+      } catch (e) {
+        document.getElementById("campus-inflation-status").textContent = "Standard Price Index (Local API Offline)";
+        document.getElementById("campus-inflation-advice").textContent = "Start FastAPI on http://127.0.0.1:8000 to sync live dataset inflation metrics.";
+      }
+    }
+    loadCampusInflation();
+
+    const form = document.getElementById("budget-form");
+    const results = document.getElementById("results");
+    const zeroDate = document.getElementById("zero-date");
+    const resultMessage = document.getElementById("result-message");
+    const remainingMoney = document.getElementById("remaining-money");
+    const daysLeft = document.getElementById("days-left");
+    const survivalMessage = document.getElementById("survival-message");
+    const recommendedBudget = document.getElementById("recommended-budget");
+    const budgetAdvice = document.getElementById("budget-advice");
+    const resetButton = document.getElementById("reset-btn");
+    const startDateInput = document.getElementById("start-date");
+
+    function formatMoney(amount) {
+      return new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR",
+        maximumFractionDigits: 2
+      }).format(amount);
+    }
+
+    function animateValue(element, start, end, duration, isCurrency = true) {
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const currentVal = progress * (end - start) + start;
+        element.textContent = isCurrency ? formatMoney(currentVal) : Math.floor(currentVal) + " Days";
+        if (progress < 1) {
+          window.requestAnimationFrame(step);
+        }
+      };
+      window.requestAnimationFrame(step);
+    }
+
+    function formatDate(date) {
+      return date.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
+    }
+
+    function addDays(date, days) {
+      const newDate = new Date(date);
+      newDate.setDate(newDate.getDate() + days);
+      return newDate;
+    }
+
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    function formatDateForInput(date) {
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    }
+    startDateInput.value = formatDateForInput(firstDay);
+
+    form.addEventListener("submit", async function(event) {
+      event.preventDefault();
+
+      const allowance = Number(document.getElementById("allowance").value);
+      const bills = Number(document.getElementById("bills").value);
+      const weekdaySpend = Number(document.getElementById("weekday-spending").value);
+      const weekendSpend = Number(document.getElementById("weekend-spending").value);
+      const startDate = new Date(startDateInput.value + "T00:00:00");
+
+      if (bills > allowance) {
+        alert("Your recurring bills cannot be greater than your allowance.");
+        return;
+      }
+
+      try {
+        const response = await fetchWithTimeout(`${API_BASE_URL}/api/predict`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            allowance: allowance,
+            bills: bills,
+            daily_spending: (weekdaySpend * 5 + weekendSpend * 2) / 7,
+            weekday_spending: weekdaySpend,
+            weekend_spending: weekendSpend
+          })
+        });
+
+        const apiData = await response.json();
+
+        if (!response.ok) {
+          alert(apiData.detail || "Prediction error occurred.");
+          return;
+        }
+
+        const balance = apiData.balance;
+        const daysUntilZero = Math.ceil(apiData.predicted_days_left);
+
+        const nextAllowanceDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 1);
+        const daysInCycle = Math.max(1, Math.round((nextAllowanceDate - startDate) / (1000 * 60 * 60 * 24)));
+        const safeDailyBudget = daysInCycle > 0 ? balance / daysInCycle : 0;
+
+        animateValue(remainingMoney, 0, balance, 800, true);
+        animateValue(recommendedBudget, 0, safeDailyBudget, 800, true);
+
+        if (daysUntilZero <= daysInCycle) {
+          animateValue(daysLeft, 0, daysUntilZero, 800, false);
+        } else {
+          daysLeft.textContent = "Safe Cycle";
+        }
+
+        document.getElementById("peer-rank-display").textContent = apiData.peer_rank;
+        document.getElementById("risk-score-display").textContent = apiData.risk_score;
+        document.getElementById("risk-percentage-text").textContent = `Model Overspend Risk Probability: ${apiData.risk_percentage}%`;
+
+        setTimeout(() => {
+          document.getElementById("risk-bar").style.width = apiData.risk_percentage + "%";
+        }, 200);
+
+        const mainCard = document.getElementById("main-result-card");
+        if (daysUntilZero <= 5 || balance <= 0) {
+          mainCard.classList.add("danger-pulse");
+        } else {
+          mainCard.classList.remove("danger-pulse");
+        }
+
+        const weightedDaily = (weekdaySpend * 5 + weekendSpend * 2) / 7;
+        const estimatedMonthlyBurn = weightedDaily * 30;
+        document.getElementById("pred-monthly-burn").textContent = formatMoney(estimatedMonthlyBurn);
+        document.getElementById("pred-weekend-cap").textContent = formatMoney(safeDailyBudget * 1.3) + " / day";
+
+        const surplusDeficitVal = balance - estimatedMonthlyBurn;
+        const surplusElem = document.getElementById("pred-surplus-deficit");
+        surplusElem.textContent = formatMoney(surplusDeficitVal);
+        surplusElem.style.color = surplusDeficitVal >= 0 ? "#2ed573" : "#ff4757";
+
+        if (balance <= 0) {
+          zeroDate.textContent = formatDate(startDate);
+          resultMessage.textContent = "Your bills consumed your entire allowance. Financial disaster on day one!";
+          survivalMessage.textContent = "Zero spendable balance left—stick strictly to mess/basic essentials.";
+          budgetAdvice.textContent = "Consider lowering fixed monthly commitments or tracking small recurring charges.";
+        } else {
+          if (daysUntilZero <= daysInCycle) {
+            const depletionDate = addDays(startDate, Math.max(0, daysUntilZero - 1));
+            zeroDate.textContent = formatDate(depletionDate);
+            resultMessage.textContent = `At your split burn rate (${formatMoney(apiData.effective_daily_spending)}/day), funds hit zero in ${daysUntilZero} days.`;
+            survivalMessage.textContent = "Your daily burn rate will run out before the month ends. Trim weekend outings and impulse snacks.";
+            budgetAdvice.textContent = `Keep average daily spend at or below ${formatMoney(safeDailyBudget)} to make it to ${formatDate(nextAllowanceDate)}.`;
+          } else {
+            zeroDate.textContent = "You survived! 🥳";
+            resultMessage.textContent = `Congratulations! Forecast predicts survival until your next credit on ${formatDate(nextAllowanceDate)}.`;
+            survivalMessage.textContent = "Your spending habits are well balanced for this cycle!";
+            budgetAdvice.textContent = `You have room to stay around ${formatMoney(safeDailyBudget)}/day while keeping a buffer.`;
+          }
+        }
+
+        results.classList.remove("hidden");
+        results.scrollIntoView({ behavior: "smooth", block: "start" });
+
+      } catch (err) {
+        console.error("API error:", err);
+        alert("Failed to connect to local FastAPI backend at http://127.0.0.1:8000. Make sure uvicorn is running.");
+      }
+    });
+
+    resetButton.addEventListener("click", function() {
+      form.reset();
+      startDateInput.value = formatDateForInput(firstDay);
+      document.getElementById("risk-bar").style.width = "0%";
+      results.classList.add("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  </script>
+</body>
+</html>
