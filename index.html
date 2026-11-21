@@ -222,6 +222,54 @@
       text-shadow: 0 2px 10px rgba(255, 255, 255, 0.9);
     }
 
+    /* Full-Window Site Ongoing Maintenance Popup */
+    .maintenance-window {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(135deg, #1b1833, #2c2654);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 9999;
+      text-align: center;
+    }
+
+    .maintenance-window.hidden {
+      display: none;
+    }
+
+    .maintenance-box {
+      max-width: 440px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      backdrop-filter: blur(10px);
+      border-radius: 22px;
+      padding: 36px 26px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    }
+
+    .maintenance-icon {
+      font-size: 48px;
+      margin-bottom: 14px;
+    }
+
+    .maintenance-box h2 {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .maintenance-box p {
+      font-size: 14px;
+      line-height: 1.7;
+      color: #e2e0f5;
+    }
+
     .results { margin-top: 28px; }
     .hidden { display: none; }
 
@@ -296,6 +344,15 @@
   </style>
 </head>
 <body>
+
+  <!-- Full-Window Maintenance Popup -->
+  <div id="maintenance-window" class="maintenance-window hidden" role="dialog" aria-modal="true" aria-live="assertive">
+    <div class="maintenance-box">
+      <div class="maintenance-icon">🛠️</div>
+      <h2>Site Ongoing Maintenance</h2>
+      <p>BrokeMeter is temporarily under maintenance. We will be back online shortly.</p>
+    </div>
+  </div>
 
   <header class="hero">
     <div id="api-status-banner" class="api-status-banner">
@@ -481,6 +538,10 @@
     const API_BASE_URL = resolveApiBaseUrl();
     const statusDot = document.getElementById("status-dot");
     const statusText = document.getElementById("status-text");
+    const maintenanceWindow = document.getElementById("maintenance-window");
+    const calcModal = document.getElementById("calc-modal");
+
+    let isSiteEnabled = true;
 
     const SESSION_ID = (() => {
       let id = sessionStorage.getItem("BROKEMETER_SESSION_ID");
@@ -503,7 +564,18 @@
       };
     }
 
-    async function fetchWithTimeout(url, options = {}, timeoutMs = 10000) {
+    function applyMaintenanceState(enabled) {
+      isSiteEnabled = Boolean(enabled);
+      if (!isSiteEnabled) {
+        calcModal.classList.add("hidden");
+        maintenanceWindow.classList.remove("hidden");
+        statusText.textContent = "Maintenance";
+      } else {
+        maintenanceWindow.classList.add("hidden");
+      }
+    }
+
+    async function fetchWithTimeout(url, options = {}, timeoutMs = 4000) {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), timeoutMs);
       try {
@@ -513,16 +585,29 @@
       }
     }
 
+    async function syncSiteStatusEverySecond() {
+      try {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/api/site-status`, { cache: "no-store" }, 3000);
+        if (res.ok) {
+          const data = await res.json();
+          statusDot.classList.add("online");
+          applyMaintenanceState(data.enabled !== false);
+          if (data.enabled !== false) {
+            statusText.textContent = "API Online";
+          }
+        }
+      } catch (_) {}
+    }
+
     async function checkApiHealth() {
       try {
-        const response = await fetchWithTimeout(`${API_BASE_URL}/api/health`);
+        const response = await fetchWithTimeout(`${API_BASE_URL}/api/health`, { cache: "no-store" }, 5000);
         if (response.ok) {
           const data = await response.json();
           statusDot.classList.add("online");
-          if (data.site_enabled === false) {
-            statusText.textContent = "Site Off";
-          } else {
-            statusText.textContent = data.model_loaded ? "API Online" : "API Online";
+          applyMaintenanceState(data.site_enabled !== false);
+          if (data.site_enabled !== false) {
+            statusText.textContent = "API Online";
           }
         } else {
           throw new Error("Non-200 health response");
@@ -532,26 +617,15 @@
         statusText.textContent = "API Offline / Waking Up";
       }
     }
-    checkApiHealth();
-    setInterval(checkApiHealth, 10000);
 
-    async function checkSiteEnabled() {
-      try {
-        const res = await fetchWithTimeout(`${API_BASE_URL}/api/site-status`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data.enabled === false) {
-            alert(data.message || "BrokeMeter is temporarily turned off.");
-            return false;
-          }
-        }
-      } catch (_) {}
-      return true;
-    }
+    checkApiHealth();
+    syncSiteStatusEverySecond();
+    setInterval(syncSiteStatusEverySecond, 1000);
+    setInterval(checkApiHealth, 10000);
 
     async function loadCampusInflation() {
       try {
-        const response = await fetchWithTimeout(`${API_BASE_URL}/api/campus-inflation`);
+        const response = await fetchWithTimeout(`${API_BASE_URL}/api/campus-inflation`, { cache: "no-store" }, 8000);
         if (response.ok) {
           const data = await response.json();
           document.getElementById("campus-inflation-status").textContent = `Inflation Index: +${data.inflation_percentage}%`;
@@ -578,8 +652,6 @@
     const resetButton = document.getElementById("reset-btn");
     const startDateInput = document.getElementById("start-date");
 
-    const calcModal = document.getElementById("calc-modal");
-
     function formatMoney(amount) {
       return new Intl.NumberFormat("en-IN", {
         style: "currency",
@@ -589,6 +661,7 @@
     }
 
     function showCalcPopup() {
+      if (!isSiteEnabled) return;
       calcModal.classList.remove("hidden");
     }
 
@@ -630,6 +703,11 @@
     form.addEventListener("submit", async function(event) {
       event.preventDefault();
 
+      await syncSiteStatusEverySecond();
+      if (!isSiteEnabled) {
+        return;
+      }
+
       const allowance = Number(document.getElementById("allowance").value);
       const bills = Number(document.getElementById("bills").value);
       const weekdaySpend = Number(document.getElementById("weekday-spending").value);
@@ -638,11 +716,6 @@
 
       if (bills > allowance) {
         alert("Your recurring bills cannot be greater than your allowance.");
-        return;
-      }
-
-      const isEnabled = await checkSiteEnabled();
-      if (!isEnabled) {
         return;
       }
 
@@ -662,7 +735,7 @@
               start_date: startDateInput.value,
               client_meta: getClientMeta()
             })
-          }),
+          }, 10000),
           new Promise((resolve) => setTimeout(resolve, 1000))
         ]);
 
@@ -670,6 +743,10 @@
 
         if (!response.ok) {
           hideCalcPopup();
+          if (response.status === 503) {
+            applyMaintenanceState(false);
+            return;
+          }
           alert(apiData.detail || "Prediction error occurred.");
           return;
         }
