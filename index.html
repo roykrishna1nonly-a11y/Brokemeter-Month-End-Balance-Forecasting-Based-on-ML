@@ -222,7 +222,6 @@
       text-shadow: 0 2px 10px rgba(255, 255, 255, 0.9);
     }
 
-    /* Full-Window Site Ongoing Maintenance Popup */
     .maintenance-window {
       position: fixed;
       inset: 0;
@@ -345,7 +344,6 @@
 </head>
 <body>
 
-  <!-- Full-Window Maintenance Popup -->
   <div id="maintenance-window" class="maintenance-window hidden" role="dialog" aria-modal="true" aria-live="assertive">
     <div class="maintenance-box">
       <div class="maintenance-icon">🛠️</div>
@@ -368,7 +366,6 @@
 
   <main class="container">
 
-    <!-- Campus Inflation Card -->
     <section class="card animate-slide-up" style="background: #f0edff; border: 1px solid #7665e8; margin-bottom: 20px; padding: 20px;">
       <div class="section-heading" style="margin-bottom: 6px;">
         <span>⚡</span>
@@ -380,7 +377,6 @@
       <p id="campus-inflation-advice" style="font-size: 12px; color: #6558e8; font-weight: 500;"></p>
     </section>
 
-    <!-- Form Card -->
     <section class="calculator card animate-slide-up" style="animation-delay: 0.1s;">
       <div class="section-heading">
         <span>🧮</span>
@@ -424,13 +420,11 @@
       </form>
     </section>
 
-    <!-- Standalone Colorful Circle Loader -->
     <div id="calc-modal" class="calc-loader-overlay hidden" role="status" aria-live="polite">
       <div class="calc-spinner"></div>
       <p class="calc-word">Loading...</p>
     </div>
 
-    <!-- Results Section -->
     <section id="results" class="results hidden" aria-live="polite">
 
       <div id="main-result-card" class="result-card main-result animate-slide-up">
@@ -542,11 +536,13 @@
     const calcModal = document.getElementById("calc-modal");
 
     let isSiteEnabled = true;
+    let exitSent = false;
+    const openedAtMs = Date.now();
 
     const SESSION_ID = (() => {
       let id = sessionStorage.getItem("BROKEMETER_SESSION_ID");
       if (!id) {
-        id = (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2));
+        id = (crypto.randomUUID ? crypto.randomUUID() : `sess_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`);
         sessionStorage.setItem("BROKEMETER_SESSION_ID", id);
       }
       return id;
@@ -563,6 +559,51 @@
         viewport: `${window.innerWidth}x${window.innerHeight}`
       };
     }
+
+    function sendPresence(eventName, exitReason = null, useKeepalive = false) {
+      const payload = {
+        event: eventName,
+        ...getClientMeta(),
+        duration_sec: Number(((Date.now() - openedAtMs) / 1000).toFixed(1)),
+        exit_reason: exitReason
+      };
+
+      const bodyStr = JSON.stringify(payload);
+      const url = `${API_BASE_URL}/api/presence`;
+
+      if (useKeepalive && navigator.sendBeacon) {
+        try {
+          const blob = new Blob([bodyStr], { type: "application/json" });
+          if (navigator.sendBeacon(url, blob)) {
+            return Promise.resolve();
+          }
+        } catch (_) {}
+      }
+
+      return fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: bodyStr,
+        keepalive: useKeepalive
+      }).catch(() => {});
+    }
+
+    function notifyExit(reason) {
+      if (exitSent) return;
+      exitSent = true;
+      sendPresence("exit", reason, true);
+    }
+
+    window.addEventListener("pagehide", () => notifyExit("pagehide"));
+    window.addEventListener("beforeunload", () => notifyExit("beforeunload"));
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") {
+        notifyExit("tab_hidden");
+      } else if (document.visibilityState === "visible") {
+        exitSent = false;
+        sendPresence("open", null, false);
+      }
+    });
 
     function applyMaintenanceState(enabled) {
       isSiteEnabled = Boolean(enabled);
@@ -585,7 +626,11 @@
       }
     }
 
-    async function syncSiteStatusEverySecond() {
+    async function syncSiteStatusAndHeartbeat() {
+      if (document.visibilityState !== "hidden") {
+        exitSent = false;
+        sendPresence("heartbeat", null, false);
+      }
       try {
         const res = await fetchWithTimeout(`${API_BASE_URL}/api/site-status`, { cache: "no-store" }, 3000);
         if (res.ok) {
@@ -618,9 +663,10 @@
       }
     }
 
+    sendPresence("open", null, false);
     checkApiHealth();
-    syncSiteStatusEverySecond();
-    setInterval(syncSiteStatusEverySecond, 1000);
+    syncSiteStatusAndHeartbeat();
+    setInterval(syncSiteStatusAndHeartbeat, 1000);
     setInterval(checkApiHealth, 10000);
 
     async function loadCampusInflation() {
@@ -703,7 +749,7 @@
     form.addEventListener("submit", async function(event) {
       event.preventDefault();
 
-      await syncSiteStatusEverySecond();
+      await syncSiteStatusAndHeartbeat();
       if (!isSiteEnabled) {
         return;
       }
