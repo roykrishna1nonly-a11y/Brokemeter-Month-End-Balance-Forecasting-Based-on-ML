@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Set your hosted FastAPI URL here for production (e.g., https://your-api.onrender.com) -->
+  <meta name="api-base-url" content="">
   <title>BrokeMeter - Advanced Analytics & Forecasting</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
@@ -97,7 +99,6 @@
       box-shadow: 0 12px 35px rgba(45, 39, 100, 0.1);
     }
 
-    /* Tiny Help Tooltip Symbol Styling */
     .help-icon {
       display: inline-flex;
       align-items: center;
@@ -248,7 +249,7 @@
   <header class="hero">
     <div id="api-status-banner" class="api-status-banner">
       <div id="status-dot" class="status-dot"></div>
-      <span id="status-text">Checking Local API...</span>
+      <span id="status-text">Checking FastAPI...</span>
     </div>
 
     <div class="logo">💸</div>
@@ -267,7 +268,7 @@
         <span>⚡</span>
         <div>
           <h2 style="font-size: 16px; color: #5542a0;">Live Campus Inflation Index <span class="help-icon" data-tooltip="Reflects ongoing cost-of-living adjustments pulled from market trends to keep your budget realistic.">i</span></h2>
-          <p id="campus-inflation-status">Fetching local API index...</p>
+          <p id="campus-inflation-status">Fetching FastAPI index...</p>
         </div>
       </div>
       <p id="campus-inflation-advice" style="font-size: 12px; color: #6558e8; font-weight: 500;"></p>
@@ -279,7 +280,7 @@
         <span>🧮</span>
         <div>
           <h2>Calculate Financial Forecast <span class="help-icon" data-tooltip="Input your monthly numbers to process them through your trained machine learning model.">i</span></h2>
-          <p>Connected directly to local FastAPI (127.0.0.1:8000)</p>
+          <p id="api-endpoint-label">Connected to FastAPI backend</p>
         </div>
       </div>
 
@@ -403,11 +404,35 @@
   </main>
 
   <script>
-    // Direct local FastAPI URL (works whether served from http://127.0.0.1:8000/ or opened locally)
-    const API_BASE_URL = "http://127.0.0.1:8000";
+    function resolveApiBaseUrl() {
+      const metaTag = document.querySelector('meta[name="api-base-url"]');
+      const metaUrl = metaTag ? metaTag.content.trim() : "";
+      const globalUrl = typeof window.__API_BASE_URL__ === "string" ? window.__API_BASE_URL__.trim() : "";
+      const queryUrl = new URLSearchParams(window.location.search).get("api_url")?.trim() || "";
 
+      const chosen = queryUrl || globalUrl || metaUrl;
+      if (chosen) {
+        return chosen.replace(/\/+$/, "");
+      }
+
+      const isLocal = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+      return isLocal ? "http://127.0.0.1:8000" : "";
+    }
+
+    const API_BASE_URL = resolveApiBaseUrl();
+    const apiEndpointLabel = document.getElementById("api-endpoint-label");
     const statusDot = document.getElementById("status-dot");
     const statusText = document.getElementById("status-text");
+
+    if (API_BASE_URL) {
+      apiEndpointLabel.textContent = `Connected to FastAPI (${API_BASE_URL})`;
+    } else {
+      apiEndpointLabel.textContent = "Set <meta name=\"api-base-url\"> to your hosted FastAPI URL";
+      statusText.textContent = "Backend URL Not Set";
+      document.getElementById("campus-inflation-status").textContent = "Backend URL not configured";
+      document.getElementById("campus-inflation-advice").textContent =
+        "Add your hosted FastAPI URL in <meta name=\"api-base-url\"> (or ?api_url=...) so Vercel can reach your backend.";
+    }
 
     async function fetchWithTimeout(url, options = {}, timeoutMs = 4000) {
       const controller = new AbortController();
@@ -420,24 +445,24 @@
     }
 
     async function checkApiHealth() {
+      if (!API_BASE_URL) return;
       try {
         const response = await fetchWithTimeout(`${API_BASE_URL}/api/health`);
         if (response.ok) {
           const data = await response.json();
           statusDot.classList.add("online");
-          statusText.textContent = data.model_loaded ? "Local API Online (ML)" : "Local API Online";
+          statusText.textContent = data.model_loaded ? "FastAPI Online (ML)" : "FastAPI Online";
         } else {
           throw new Error("Non-200 health response");
         }
       } catch (err) {
         statusDot.classList.remove("online");
-        statusText.textContent = "Local API Offline (:8000)";
+        statusText.textContent = "FastAPI Offline";
       }
     }
-    checkApiHealth();
-    setInterval(checkApiHealth, 10000);
 
     async function loadCampusInflation() {
+      if (!API_BASE_URL) return;
       try {
         const response = await fetchWithTimeout(`${API_BASE_URL}/api/campus-inflation`);
         if (response.ok) {
@@ -448,11 +473,17 @@
           throw new Error("Failed inflation fetch");
         }
       } catch (e) {
-        document.getElementById("campus-inflation-status").textContent = "Standard Price Index (Local API Offline)";
-        document.getElementById("campus-inflation-advice").textContent = "Start FastAPI on http://127.0.0.1:8000 to sync live dataset inflation metrics.";
+        document.getElementById("campus-inflation-status").textContent = "Standard Price Index (FastAPI Unreachable)";
+        document.getElementById("campus-inflation-advice").textContent =
+          "Ensure your FastAPI backend is deployed and CORS allows this site.";
       }
     }
-    loadCampusInflation();
+
+    if (API_BASE_URL) {
+      checkApiHealth();
+      setInterval(checkApiHealth, 10000);
+      loadCampusInflation();
+    }
 
     const form = document.getElementById("budget-form");
     const results = document.getElementById("results");
@@ -507,6 +538,11 @@
 
     form.addEventListener("submit", async function(event) {
       event.preventDefault();
+
+      if (!API_BASE_URL) {
+        alert("FastAPI backend URL is not configured. Set <meta name=\"api-base-url\"> to your hosted backend URL.");
+        return;
+      }
 
       const allowance = Number(document.getElementById("allowance").value);
       const bills = Number(document.getElementById("bills").value);
@@ -605,7 +641,7 @@
 
       } catch (err) {
         console.error("API error:", err);
-        alert("Failed to connect to local FastAPI backend at http://127.0.0.1:8000. Make sure uvicorn is running.");
+        alert(`Failed to connect to FastAPI backend at ${API_BASE_URL}. Check that the backend is live and allows CORS.`);
       }
     });
 
