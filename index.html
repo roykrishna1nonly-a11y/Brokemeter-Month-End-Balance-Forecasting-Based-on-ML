@@ -249,7 +249,7 @@
   <header class="hero">
     <div id="api-status-banner" class="api-status-banner">
       <div id="status-dot" class="status-dot"></div>
-      <span id="status-text">Checking Local API...</span>
+      <span id="status-text">Checking API...</span>
     </div>
 
     <div class="logo">💸</div>
@@ -268,7 +268,7 @@
         <span>⚡</span>
         <div>
           <h2 style="font-size: 16px; color: #5542a0;">Live Campus Inflation Index <span class="help-icon" data-tooltip="Reflects ongoing cost-of-living adjustments pulled from market trends to keep your budget realistic.">i</span></h2>
-          <p id="campus-inflation-status">Fetching local API index...</p>
+          <p id="campus-inflation-status">Fetching API index...</p>
         </div>
       </div>
       <p id="campus-inflation-advice" style="font-size: 12px; color: #6558e8; font-weight: 500;"></p>
@@ -280,7 +280,7 @@
         <span>🧮</span>
         <div>
           <h2>Calculate Financial Forecast <span class="help-icon" data-tooltip="Input your monthly numbers to process them through your trained machine learning model.">i</span></h2>
-          <p>Connected directly to local FastAPI (127.0.0.1:8000)</p>
+          <p id="api-endpoint-label">Connected to https://backendforbrokemeter.onrender.com</p>
         </div>
       </div>
 
@@ -404,13 +404,37 @@
   </main>
 
   <script>
-    // Direct local FastAPI URL (works whether served from http://127.0.0.1:8000/ or opened locally)
-    const DEFAULT_HOSTED_API_URL = "https://backendforbrokemeter.onrender.com/";
+    const DEFAULT_HOSTED_API_URL = "https://backendforbrokemeter.onrender.com";
 
+    function resolveApiBaseUrl() {
+      const params = new URLSearchParams(window.location.search);
+      const queryUrl = params.get("api_url")?.trim() || "";
+      if (queryUrl) {
+        localStorage.setItem("BROKEMETER_API_URL", queryUrl.replace(/\/+$/, ""));
+      }
+
+      const metaTag = document.querySelector('meta[name="api-base-url"]');
+      const metaUrl = metaTag ? metaTag.content.trim() : "";
+      const globalUrl = typeof window.__API_BASE_URL__ === "string" ? window.__API_BASE_URL__.trim() : "";
+      const savedUrl = localStorage.getItem("BROKEMETER_API_URL")?.trim() || "";
+
+      const chosen = queryUrl || globalUrl || metaUrl || DEFAULT_HOSTED_API_URL || savedUrl;
+      if (chosen) {
+        return chosen.replace(/\/+$/, "");
+      }
+
+      const isLocal = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+      return isLocal ? "http://127.0.0.1:8000" : window.location.origin;
+    }
+
+    const API_BASE_URL = resolveApiBaseUrl();
+    const apiEndpointLabel = document.getElementById("api-endpoint-label");
     const statusDot = document.getElementById("status-dot");
     const statusText = document.getElementById("status-text");
 
-    async function fetchWithTimeout(url, options = {}, timeoutMs = 4000) {
+    apiEndpointLabel.textContent = `Connected to ${API_BASE_URL}`;
+
+    async function fetchWithTimeout(url, options = {}, timeoutMs = 10000) {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), timeoutMs);
       try {
@@ -426,13 +450,13 @@
         if (response.ok) {
           const data = await response.json();
           statusDot.classList.add("online");
-          statusText.textContent = data.model_loaded ? "Local API Online (ML)" : "Local API Online";
+          statusText.textContent = data.model_loaded ? "API Online (ML)" : "API Online";
         } else {
           throw new Error("Non-200 health response");
         }
       } catch (err) {
         statusDot.classList.remove("online");
-        statusText.textContent = "Local API Offline (:8000)";
+        statusText.textContent = "API Offline / Waking Up";
       }
     }
     checkApiHealth();
@@ -449,8 +473,8 @@
           throw new Error("Failed inflation fetch");
         }
       } catch (e) {
-        document.getElementById("campus-inflation-status").textContent = "Standard Price Index (Local API Offline)";
-        document.getElementById("campus-inflation-advice").textContent = "Start FastAPI on http://127.0.0.1:8000 to sync live dataset inflation metrics.";
+        document.getElementById("campus-inflation-status").textContent = "Standard Price Index (API Unreachable)";
+        document.getElementById("campus-inflation-advice").textContent = `Unable to reach ${API_BASE_URL}. Render may still be spinning up or deploying.`;
       }
     }
     loadCampusInflation();
@@ -606,7 +630,7 @@
 
       } catch (err) {
         console.error("API error:", err);
-        alert("Failed to connect to local FastAPI backend at http://127.0.0.1:8000. Make sure uvicorn is running.");
+        alert(`Failed to connect to FastAPI backend at ${API_BASE_URL}. Please try again in a few seconds if Render is waking up.`);
       }
     });
 
