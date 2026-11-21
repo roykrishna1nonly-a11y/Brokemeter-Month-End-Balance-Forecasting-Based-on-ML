@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 import logging
 import math
 import os
+from pathlib import Path
 import pickle
 from typing import Optional
 
@@ -15,8 +16,10 @@ from pydantic import BaseModel, Field
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("brokemeter")
 
-MODEL_PATH = "brokemeter_model.pkl"
-CSV_PATH = "cleaned_brokemeter_data.csv"
+BASE_DIR = Path(__file__).resolve().parent
+MODEL_PATH = Path(os.getenv("MODEL_PATH", BASE_DIR / "brokemeter_model.pkl"))
+CSV_PATH = Path(os.getenv("CSV_PATH", BASE_DIR / "cleaned_brokemeter_data.csv"))
+INDEX_PATH = Path(os.getenv("INDEX_PATH", BASE_DIR / "index.html"))
 
 model = None
 df_spendings: Optional[pd.DataFrame] = None
@@ -32,7 +35,7 @@ def _safe_float(value: float, default: float = 0.0, decimals: int = 2) -> float:
 async def lifespan(app: FastAPI):
     global model, df_spendings
 
-    if os.path.exists(MODEL_PATH):
+    if MODEL_PATH.exists():
         try:
             with open(MODEL_PATH, "rb") as f:
                 model = pickle.load(f)
@@ -43,7 +46,7 @@ async def lifespan(app: FastAPI):
     else:
         logger.info("Model file '%s' not found; using arithmetic fallback.", MODEL_PATH)
 
-    if os.path.exists(CSV_PATH):
+    if CSV_PATH.exists():
         try:
             df_spendings = pd.read_csv(CSV_PATH)
             logger.info("Loaded dataset '%s' with %d rows.", CSV_PATH, len(df_spendings))
@@ -65,9 +68,22 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+allowed_origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+]
+frontend_url = os.getenv("FRONTEND_URL", "").strip()
+if frontend_url:
+    allowed_origins.append(frontend_url.rstrip("/"))
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -242,17 +258,18 @@ def get_spendings_summary():
 
 @app.get("/", response_class=HTMLResponse)
 def serve_index():
-    index_path = "index.html"
-    if not os.path.exists(index_path):
+    if not INDEX_PATH.exists():
         return HTMLResponse(
-            content="<h3>BrokeMeter API is running</h3><p>Place an <code>index.html</code> file next to <code>main.py</code> to serve the frontend, or visit <a href='/docs'>/docs</a>.</p>",
+            content="<h3>BrokeMeter API is running</h3><p>Place an <code>index.html</code> file next to the backend to serve the frontend, or visit <a href='/docs'>/docs</a>.</p>",
             status_code=200,
         )
-    with open(index_path, "r", encoding="utf-8") as f:
+    with open(INDEX_PATH, "r", encoding="utf-8") as f:
         return HTMLResponse(content=f.read(), status_code=200)
 
 
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    port = int(os.getenv("PORT", "8000"))
+    is_dev = os.getenv("ENV", "production").lower() == "development"
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=is_dev)
