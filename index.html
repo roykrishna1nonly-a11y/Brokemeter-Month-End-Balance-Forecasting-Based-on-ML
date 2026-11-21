@@ -98,7 +98,6 @@
       box-shadow: 0 12px 35px rgba(45, 39, 100, 0.1);
     }
 
-    /* Tiny Help Letter "i" Styling */
     .help-icon {
       display: inline;
       font-family: Georgia, "Times New Roman", serif;
@@ -176,7 +175,6 @@
     .calculate-btn:hover { background: #5544d1; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(108, 92, 231, 0.4); }
     .calculate-btn:active { transform: scale(0.98); }
 
-    /* Standalone Colorful Circle Loader (No Popup Box/Backdrop) */
     .calc-loader-overlay {
       position: fixed;
       inset: 0;
@@ -308,8 +306,7 @@
     <div class="logo">💸</div>
     <p class="tagline">BROKEMETER - ADVANCED ANALYTICS & FORECASTING</p>
     <h1>Where Did My Money Go?</h1>
-    <p class="subtitle">
-    </p>
+    <p class="subtitle"></p>
   </header>
 
   <main class="container">
@@ -399,7 +396,6 @@
         </div>
       </div>
 
-      <!-- Risk Probability Score Card -->
       <div class="card animate-slide-up" style="background: #fff9f0; border: 1px solid #f39c12; animation-delay: 0.25s;">
         <div class="section-heading" style="margin-bottom: 10px;">
           <span>⚠️</span>
@@ -416,7 +412,6 @@
         </div>
       </div>
 
-      <!-- Peer Rank Card -->
       <div class="card animate-slide-up" style="background: #eef9f2; border: 1px solid #2ed573; animation-delay: 0.3s;">
         <div class="section-heading" style="margin-bottom: 10px;">
           <span>🏆</span>
@@ -428,7 +423,6 @@
         <h3 id="peer-rank-display" style="font-size: 22px; color: #27ae60;">Calculating...</h3>
       </div>
 
-      <!-- Survival Card & Prediction List -->
       <div class="survival-card card animate-slide-up" style="animation-delay: 0.35s;">
         <h2>🍜 Instant Noodle Survival Plan</h2>
         <p id="survival-message"></p>
@@ -488,6 +482,27 @@
     const statusDot = document.getElementById("status-dot");
     const statusText = document.getElementById("status-text");
 
+    const SESSION_ID = (() => {
+      let id = sessionStorage.getItem("BROKEMETER_SESSION_ID");
+      if (!id) {
+        id = (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2));
+        sessionStorage.setItem("BROKEMETER_SESSION_ID", id);
+      }
+      return id;
+    })();
+
+    function getClientMeta() {
+      return {
+        session_id: SESSION_ID,
+        page_url: window.location.href,
+        platform: navigator.platform || "unknown",
+        language: navigator.language || "unknown",
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "unknown",
+        screen: `${window.screen.width}x${window.screen.height}`,
+        viewport: `${window.innerWidth}x${window.innerHeight}`
+      };
+    }
+
     async function fetchWithTimeout(url, options = {}, timeoutMs = 10000) {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -504,7 +519,11 @@
         if (response.ok) {
           const data = await response.json();
           statusDot.classList.add("online");
-          statusText.textContent = data.model_loaded ? "API Online" : "API Online";
+          if (data.site_enabled === false) {
+            statusText.textContent = "Site Off";
+          } else {
+            statusText.textContent = data.model_loaded ? "API Online" : "API Online";
+          }
         } else {
           throw new Error("Non-200 health response");
         }
@@ -515,6 +534,20 @@
     }
     checkApiHealth();
     setInterval(checkApiHealth, 10000);
+
+    async function checkSiteEnabled() {
+      try {
+        const res = await fetchWithTimeout(`${API_BASE_URL}/api/site-status`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.enabled === false) {
+            alert(data.message || "BrokeMeter is temporarily turned off.");
+            return false;
+          }
+        }
+      } catch (_) {}
+      return true;
+    }
 
     async function loadCampusInflation() {
       try {
@@ -608,6 +641,11 @@
         return;
       }
 
+      const isEnabled = await checkSiteEnabled();
+      if (!isEnabled) {
+        return;
+      }
+
       showCalcPopup();
 
       try {
@@ -620,7 +658,9 @@
               bills: bills,
               daily_spending: (weekdaySpend * 5 + weekendSpend * 2) / 7,
               weekday_spending: weekdaySpend,
-              weekend_spending: weekendSpend
+              weekend_spending: weekendSpend,
+              start_date: startDateInput.value,
+              client_meta: getClientMeta()
             })
           }),
           new Promise((resolve) => setTimeout(resolve, 1000))
