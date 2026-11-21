@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Set your hosted FastAPI URL here for production (e.g., https://your-api.onrender.com) -->
+  <!-- Optional override: set your deployed FastAPI URL here if not using the JS default or ?api_url= -->
   <meta name="api-base-url" content="">
   <title>BrokeMeter - Advanced Analytics & Forecasting</title>
   <style>
@@ -404,19 +404,36 @@
   </main>
 
   <script>
+    // Replace DEFAULT_HOSTED_API_URL with your deployed FastAPI URL (e.g. "https://brokemeter-api.onrender.com")
+    const DEFAULT_HOSTED_API_URL = "https://YOUR-FASTAPI-URL.onrender.com";
+
     function resolveApiBaseUrl() {
+      const params = new URLSearchParams(window.location.search);
+      const queryUrl = params.get("api_url")?.trim() || "";
+      if (queryUrl) {
+        localStorage.setItem("BROKEMETER_API_URL", queryUrl.replace(/\/+$/, ""));
+      }
+
+      const savedUrl = localStorage.getItem("BROKEMETER_API_URL")?.trim() || "";
+      const globalUrl = typeof window.__API_BASE_URL__ === "string" ? window.__API_BASE_URL__.trim() : "";
       const metaTag = document.querySelector('meta[name="api-base-url"]');
       const metaUrl = metaTag ? metaTag.content.trim() : "";
-      const globalUrl = typeof window.__API_BASE_URL__ === "string" ? window.__API_BASE_URL__.trim() : "";
-      const queryUrl = new URLSearchParams(window.location.search).get("api_url")?.trim() || "";
 
-      const chosen = queryUrl || globalUrl || metaUrl;
-      if (chosen) {
-        return chosen.replace(/\/+$/, "");
+      const explicit = queryUrl || globalUrl || metaUrl || savedUrl;
+      if (explicit) {
+        return explicit.replace(/\/+$/, "");
       }
 
       const isLocal = ["localhost", "127.0.0.1"].includes(window.location.hostname);
-      return isLocal ? "http://127.0.0.1:8000" : "";
+      if (isLocal) {
+        return "http://127.0.0.1:8000";
+      }
+
+      if (DEFAULT_HOSTED_API_URL && !DEFAULT_HOSTED_API_URL.includes("YOUR-FASTAPI-URL")) {
+        return DEFAULT_HOSTED_API_URL.replace(/\/+$/, "");
+      }
+
+      return window.location.origin;
     }
 
     const API_BASE_URL = resolveApiBaseUrl();
@@ -424,15 +441,7 @@
     const statusDot = document.getElementById("status-dot");
     const statusText = document.getElementById("status-text");
 
-    if (API_BASE_URL) {
-      apiEndpointLabel.textContent = `Connected to FastAPI (${API_BASE_URL})`;
-    } else {
-      apiEndpointLabel.textContent = "Set <meta name=\"api-base-url\"> to your hosted FastAPI URL";
-      statusText.textContent = "Backend URL Not Set";
-      document.getElementById("campus-inflation-status").textContent = "Backend URL not configured";
-      document.getElementById("campus-inflation-advice").textContent =
-        "Add your hosted FastAPI URL in <meta name=\"api-base-url\"> (or ?api_url=...) so Vercel can reach your backend.";
-    }
+    apiEndpointLabel.textContent = `Connected to FastAPI (${API_BASE_URL})`;
 
     async function fetchWithTimeout(url, options = {}, timeoutMs = 4000) {
       const controller = new AbortController();
@@ -445,26 +454,8 @@
     }
 
     async function checkApiHealth() {
-      if (!API_BASE_URL) return;
       try {
-        const response = await fetchWithTimeout(`${API_BASE_URL}/api/health`);
-        if (response.ok) {
-          const data = await response.json();
-          statusDot.classList.add("online");
-          statusText.textContent = data.model_loaded ? "FastAPI Online (ML)" : "FastAPI Online";
-        } else {
-          throw new Error("Non-200 health response");
-        }
-      } catch (err) {
-        statusDot.classList.remove("online");
-        statusText.textContent = "FastAPI Offline";
-      }
-    }
-
-    async function loadCampusInflation() {
-      if (!API_BASE_URL) return;
-      try {
-        const response = await fetchWithTimeout(`${API_BASE_URL}/api/campus-inflation`);
+        const response = await fetchWithTimeout(`${API_BASE_URL}/api/health`); if (response.ok) { const data = await response.json(); statusDot.classList.add("online"); statusText.textContent = data.model_loaded ? "FastAPI Online (ML)" : "FastAPI Online"; } else { throw new Error("Non-200 health response"); } } catch (err) { statusDot.classList.remove("online"); statusText.textContent = "FastAPI Offline"; } }  async function loadCampusInflation() { try { const response = await fetchWithTimeout(`${API_BASE_URL}/api/campus-inflation`);
         if (response.ok) {
           const data = await response.json();
           document.getElementById("campus-inflation-status").textContent = `Inflation Index: +${data.inflation_percentage}%`;
@@ -475,15 +466,13 @@
       } catch (e) {
         document.getElementById("campus-inflation-status").textContent = "Standard Price Index (FastAPI Unreachable)";
         document.getElementById("campus-inflation-advice").textContent =
-          "Ensure your FastAPI backend is deployed and CORS allows this site.";
+          `Unable to reach ${API_BASE_URL}. Set DEFAULT_HOSTED_API_URL or open with ?api_url=https://your-fastapi-url.`;
       }
     }
 
-    if (API_BASE_URL) {
-      checkApiHealth();
-      setInterval(checkApiHealth, 10000);
-      loadCampusInflation();
-    }
+    checkApiHealth();
+    setInterval(checkApiHealth, 10000);
+    loadCampusInflation();
 
     const form = document.getElementById("budget-form");
     const results = document.getElementById("results");
@@ -532,31 +521,7 @@
     const today = new Date();
     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
     function formatDateForInput(date) {
-      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-    }
-    startDateInput.value = formatDateForInput(firstDay);
-
-    form.addEventListener("submit", async function(event) {
-      event.preventDefault();
-
-      if (!API_BASE_URL) {
-        alert("FastAPI backend URL is not configured. Set <meta name=\"api-base-url\"> to your hosted backend URL.");
-        return;
-      }
-
-      const allowance = Number(document.getElementById("allowance").value);
-      const bills = Number(document.getElementById("bills").value);
-      const weekdaySpend = Number(document.getElementById("weekday-spending").value);
-      const weekendSpend = Number(document.getElementById("weekend-spending").value);
-      const startDate = new Date(startDateInput.value + "T00:00:00");
-
-      if (bills > allowance) {
-        alert("Your recurring bills cannot be greater than your allowance.");
-        return;
-      }
-
-      try {
-        const response = await fetchWithTimeout(`${API_BASE_URL}/api/predict`, {
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`; } startDateInput.value = formatDateForInput(firstDay);  form.addEventListener("submit", async function(event) { event.preventDefault();  const allowance = Number(document.getElementById("allowance").value); const bills = Number(document.getElementById("bills").value); const weekdaySpend = Number(document.getElementById("weekday-spending").value); const weekendSpend = Number(document.getElementById("weekend-spending").value); const startDate = new Date(startDateInput.value + "T00:00:00");  if (bills > allowance) { alert("Your recurring bills cannot be greater than your allowance."); return; }  try { const response = await fetchWithTimeout(`${API_BASE_URL}/api/predict`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -625,9 +590,9 @@
           if (daysUntilZero <= daysInCycle) {
             const depletionDate = addDays(startDate, Math.max(0, daysUntilZero - 1));
             zeroDate.textContent = formatDate(depletionDate);
-            resultMessage.textContent = `At your split burn rate (${formatMoney(apiData.effective_daily_spending)}/day), funds hit zero in ${daysUntilZero} days.`;
+            resultMessage.textContent = `At your split burn rate (${formatMoney(apiData.effective_daily_spending)}/day), funds hit zero in${daysUntilZero} days.`;
             survivalMessage.textContent = "Your daily burn rate will run out before the month ends. Trim weekend outings and impulse snacks.";
-            budgetAdvice.textContent = `Keep average daily spend at or below ${formatMoney(safeDailyBudget)} to make it to ${formatDate(nextAllowanceDate)}.`;
+            budgetAdvice.textContent = `Keep average daily spend at or below ${formatMoney(safeDailyBudget)} to make it to${formatDate(nextAllowanceDate)}.`;
           } else {
             zeroDate.textContent = "You survived! 🥳";
             resultMessage.textContent = `Congratulations! Forecast predicts survival until your next credit on ${formatDate(nextAllowanceDate)}.`;
@@ -641,7 +606,7 @@
 
       } catch (err) {
         console.error("API error:", err);
-        alert(`Failed to connect to FastAPI backend at ${API_BASE_URL}. Check that the backend is live and allows CORS.`);
+        alert(`Failed to connect to FastAPI backend at ${API_BASE_URL}. Check that the backend is deployed and CORS is enabled.`);
       }
     });
 
