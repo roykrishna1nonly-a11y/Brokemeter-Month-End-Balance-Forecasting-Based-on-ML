@@ -16,6 +16,7 @@
       color: #25243a;
       min-height: 100vh;
       overflow-x: hidden;
+      font-size: 11px;
     }
 
     .hero {
@@ -24,7 +25,7 @@
       animation: gradientShift 12s ease infinite;
       color: white;
       text-align: center;
-      padding: 60px 20px 90px;
+      padding: 44px 16px 72px;
       position: relative;
     }
 
@@ -36,66 +37,66 @@
 
     .api-status-banner {
       position: absolute;
-      top: 15px;
-      right: 20px;
+      top: 12px;
+      right: 16px;
       background: rgba(255, 255, 255, 0.15);
       backdrop-filter: blur(6px);
-      padding: 6px 14px;
+      padding: 4px 10px;
       border-radius: 20px;
-      font-size: 11px;
+      font-size: 9px;
       font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
-    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #ff4757; position: relative; }
-    .status-dot.online { background: #2ed573; box-shadow: 0 0 10px #2ed573; animation: pulseDot 2s infinite; }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #ff4757; position: relative; }
+    .status-dot.online { background: #2ed573; box-shadow: 0 0 8px #2ed573; animation: pulseDot 2s infinite; }
 
     @keyframes pulseDot {
       0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 213, 115, 0.7); }
-      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(46, 213, 115, 0); }
+      70% { transform: scale(1); box-shadow: 0 0 0 5px rgba(46, 213, 115, 0); }
       100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 213, 115, 0); }
     }
 
     .logo {
-      font-size: 50px;
-      margin-bottom: 10px;
+      font-size: 32px;
+      margin-bottom: 6px;
       display: inline-block;
       animation: floatLogo 3s ease-in-out infinite;
     }
 
     @keyframes floatLogo {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
+      50% { transform: translateY(-6px); }
     }
 
-    .tagline { font-size: 12px; font-weight: 600; letter-spacing: 3px; opacity: 0.85; }
-    .hero h1 { font-size: clamp(28px, 5vw, 45px); margin: 15px 0; font-weight: 800; }
-    .subtitle { max-width: 600px; margin: auto; font-size: 14px; line-height: 1.8; opacity: 0.9; }
+    .tagline { font-size: 9px; font-weight: 600; letter-spacing: 2px; opacity: 0.85; }
+    .hero h1 { font-size: clamp(20px, 3.6vw, 28px); margin: 10px 0; font-weight: 800; }
+    .subtitle { max-width: 520px; margin: auto; font-size: 10px; line-height: 1.6; opacity: 0.9; }
 
     .container {
-      width: 90%;
-      max-width: 750px;
-      margin: -45px auto 0;
+      width: 92%;
+      max-width: 680px;
+      margin: -36px auto 0;
       position: relative;
-      padding-bottom: 60px;
+      padding-bottom: 44px;
     }
 
     .card {
       background: white;
-      border-radius: 18px;
-      padding: 28px;
-      box-shadow: 0 8px 30px rgba(45, 39, 100, 0.07);
-      margin-bottom: 24px;
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 8px 24px rgba(45, 39, 100, 0.07);
+      margin-bottom: 16px;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       position: relative;
     }
 
     .card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 35px rgba(45, 39, 100, 0.1);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(45, 39, 100, 0.1);
     }
 
     /* Tiny Help Letter "i" Styling */
@@ -103,7 +104,7 @@
       display: inline;
       font-family: Georgia, "Times New Roman", serif;
       font-style: italic;
-      font-size: 8.5px;
+      font-size: 7.5px;
       font-weight: 600;
       color: #7c6ee6;
       opacity: 0.75;
@@ -127,68 +128,68 @@
       transform: translateX(-50%);
       background: #292449;
       color: white;
-      padding: 8px 12px;
-      border-radius: 8px;
+      padding: 6px 10px;
+      border-radius: 6px;
       font-family: 'Poppins', Arial, sans-serif;
       font-style: normal;
-      font-size: 11px;
+      font-size: 9.5px;
       font-weight: 400;
-      width: 220px;
+      width: 190px;
       text-align: left;
       z-index: 100;
       box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-      line-height: 1.4;
+      line-height: 1.35;
       pointer-events: none;
     }
 
     .section-heading {
       display: flex;
       align-items: center;
-      gap: 15px;
-      margin-bottom: 24px;
+      gap: 11px;
+      margin-bottom: 16px;
     }
 
-    .section-heading span { font-size: 32px; }
-    .section-heading h2 { font-size: 19px; }
-    .section-heading p { font-size: 12px; color: #85849a; margin-top: 3px; }
+    .section-heading span { font-size: 22px; }
+    .section-heading h2 { font-size: 13px; }
+    .section-heading p { font-size: 9.5px; color: #85849a; margin-top: 2px; }
 
     .server-link-row {
       display: inline-flex;
       align-items: center;
-      gap: 7px;
+      gap: 5px;
     }
 
     .server-dot {
-      width: 8px;
-      height: 8px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
       background: #2ed573;
-      box-shadow: 0 0 8px rgba(46, 213, 115, 0.75);
+      box-shadow: 0 0 6px rgba(46, 213, 115, 0.75);
       flex-shrink: 0;
     }
 
-    .form-group { margin-bottom: 18px; }
-    .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+    .form-group { margin-bottom: 13px; }
+    .form-group label { display: block; font-size: 10px; font-weight: 600; margin-bottom: 5px; }
 
     .form-group input {
-      width: 100%; padding: 13px; border: 1px solid #deddea; border-radius: 10px;
-      font-size: 14px; outline: none; font-family: inherit; transition: all 0.25s ease;
+      width: 100%; padding: 9px 11px; border: 1px solid #deddea; border-radius: 8px;
+      font-size: 11px; outline: none; font-family: inherit; transition: all 0.25s ease;
     }
     .form-group input:focus {
       border-color: #7665e8;
-      box-shadow: 0 0 0 4px rgba(118, 101, 232, 0.15);
+      box-shadow: 0 0 0 3px rgba(118, 101, 232, 0.15);
       transform: translateY(-1px);
     }
-    .form-group small { display: block; margin-top: 6px; color: #9291a3; font-size: 11px; }
+    .form-group small { display: block; margin-top: 4px; color: #9291a3; font-size: 9px; }
 
-    .split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
 
     .calculate-btn, .reset-btn {
-      width: 100%; padding: 15px; border: none; border-radius: 10px;
-      font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer; transition: all 0.2s ease;
+      width: 100%; padding: 11px; border: none; border-radius: 8px;
+      font-size: 11px; font-weight: 700; font-family: inherit; cursor: pointer; transition: all 0.2s ease;
     }
-    .calculate-btn { background: #6c5ce7; color: white; margin-top: 8px; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3); }
-    .calculate-btn:hover { background: #5544d1; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(108, 92, 231, 0.4); }
+    .calculate-btn { background: #6c5ce7; color: white; margin-top: 6px; box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3); }
+    .calculate-btn:hover { background: #5544d1; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(108, 92, 231, 0.4); }
     .calculate-btn:active { transform: scale(0.98); }
 
     /* Loading Popup Modal */
@@ -200,7 +201,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 16px;
       z-index: 999;
     }
 
@@ -211,11 +212,11 @@
     .calc-modal-card {
       background: white;
       width: 100%;
-      max-width: 300px;
-      border-radius: 20px;
-      padding: 32px 24px;
+      max-width: 240px;
+      border-radius: 14px;
+      padding: 22px 18px;
       text-align: center;
-      box-shadow: 0 18px 45px rgba(25, 22, 54, 0.25);
+      box-shadow: 0 14px 36px rgba(25, 22, 54, 0.25);
       animation: modalPop 0.25s ease-out;
     }
 
@@ -225,12 +226,12 @@
     }
 
     .calc-spinner {
-      width: 40px;
-      height: 40px;
-      border: 4px solid #ece9ff;
+      width: 28px;
+      height: 28px;
+      border: 3px solid #ece9ff;
       border-top-color: #6c5ce7;
       border-radius: 50%;
-      margin: 0 auto 16px;
+      margin: 0 auto 10px;
       animation: spinLoader 0.8s linear infinite;
     }
 
@@ -239,18 +240,18 @@
     }
 
     .calc-word {
-      font-size: 18px;
+      font-size: 11px;
       font-weight: 700;
       color: #25243a;
     }
 
-    .results { margin-top: 28px; }
+    .results { margin-top: 20px; }
     .hidden { display: none; }
 
     .animate-slide-up {
       animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(16px);
     }
 
     @keyframes slideUpFade {
@@ -259,62 +260,62 @@
 
     .main-result {
       background: linear-gradient(135deg, #292449, #5542a0);
-      color: white; padding: 35px 25px; border-radius: 18px; text-align: center;
-      box-shadow: 0 8px 25px rgba(45, 39, 100, 0.12);
+      color: white; padding: 24px 18px; border-radius: 14px; text-align: center;
+      box-shadow: 0 8px 20px rgba(45, 39, 100, 0.12);
     }
 
     .danger-pulse {
       animation: dangerGlow 1.5s infinite alternate;
     }
     @keyframes dangerGlow {
-      0% { box-shadow: 0 0 15px rgba(255, 71, 87, 0.3); border: 1px solid rgba(255, 71, 87, 0.4); }
-      100% { box-shadow: 0 0 30px rgba(255, 71, 87, 0.7); border: 1px solid rgba(255, 71, 87, 0.9); }
+      0% { box-shadow: 0 0 12px rgba(255, 71, 87, 0.3); border: 1px solid rgba(255, 71, 87, 0.4); }
+      100% { box-shadow: 0 0 24px rgba(255, 71, 87, 0.7); border: 1px solid rgba(255, 71, 87, 0.9); }
     }
 
-    .result-label { font-size: 11px; letter-spacing: 2px; opacity: 0.8; font-weight: 600; }
-    .main-result h2 { font-size: clamp(25px, 5vw, 35px); margin: 15px 0; }
-    #result-message { font-size: 13px; line-height: 1.7; opacity: 0.9; }
+    .result-label { font-size: 9px; letter-spacing: 1.5px; opacity: 0.8; font-weight: 600; }
+    .main-result h2 { font-size: clamp(17px, 3.2vw, 22px); margin: 10px 0; }
+    #result-message { font-size: 10px; line-height: 1.55; opacity: 0.9; }
 
-    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 20px 0; }
-    .stat-card { text-align: center; padding: 25px 15px; }
-    .stat-card span { font-size: 28px; }
-    .stat-card p { font-size: 12px; color: #85849a; margin: 10px 0; }
-    .stat-card h3 { font-size: 23px; color: #6656df; }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
+    .stat-card { text-align: center; padding: 16px 12px; }
+    .stat-card span { font-size: 20px; }
+    .stat-card p { font-size: 9.5px; color: #85849a; margin: 6px 0; }
+    .stat-card h3 { font-size: 15px; color: #6656df; }
 
     .risk-progress-container {
-      width: 100%; background: #e2def8; border-radius: 8px; height: 10px; margin-top: 12px; overflow: hidden;
+      width: 100%; background: #e2def8; border-radius: 6px; height: 7px; margin-top: 9px; overflow: hidden;
     }
     .risk-progress-bar {
       height: 100%; width: 0%;
       background: linear-gradient(90deg, #2ed573, #ffa502, #ff4757);
-      border-radius: 8px; transition: width 1s cubic-bezier(0.1, 1, 0.1, 1);
+      border-radius: 6px; transition: width 1s cubic-bezier(0.1, 1, 0.1, 1);
     }
 
     .budget-highlight {
-      background: #f1efff; border-radius: 12px; padding: 20px; text-align: center; margin: 20px 0;
+      background: #f1efff; border-radius: 10px; padding: 14px; text-align: center; margin: 14px 0;
     }
-    .budget-highlight p { font-size: 12px; color: #7770a5; }
-    .budget-highlight h3 { font-size: 32px; color: #6558e8; margin-top: 8px; }
+    .budget-highlight p { font-size: 9.5px; color: #7770a5; }
+    .budget-highlight h3 { font-size: 20px; color: #6558e8; margin-top: 5px; }
 
     .advice {
-      font-size: 12px;
+      font-size: 10px;
       color: #55536f;
-      line-height: 1.6;
-      margin-bottom: 12px;
+      line-height: 1.5;
+      margin-bottom: 9px;
     }
 
-    .reset-btn { background: #e9e6ff; color: #6558e8; margin-top: 15px; }
+    .reset-btn { background: #e9e6ff; color: #6558e8; margin-top: 10px; }
     .reset-btn:hover { background: #dcd7ff; }
 
     .prediction-list {
-      background: #faf9ff; border: 1px solid #e2def8; border-radius: 14px; padding: 18px; margin-top: 15px;
+      background: #faf9ff; border: 1px solid #e2def8; border-radius: 10px; padding: 13px; margin-top: 10px;
     }
-    .prediction-list h3 { font-size: 15px; color: #5542a0; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-    .prediction-list ul { list-style: none; font-size: 12px; color: #55536f; line-height: 2; }
+    .prediction-list h3 { font-size: 11px; color: #5542a0; margin-bottom: 7px; display: flex; align-items: center; gap: 6px; }
+    .prediction-list ul { list-style: none; font-size: 9.5px; color: #55536f; line-height: 1.8; }
     .prediction-list ul li::before { content: "🔹 "; color: #6c5ce7; }
 
-    footer { text-align: center; padding: 35px 10px; color: #77768b; font-size: 12px; line-height: 2; }
-    .footer-small { font-size: 11px; color: #aaa8b9; }
+    footer { text-align: center; padding: 24px 10px; color: #77768b; font-size: 9.5px; line-height: 1.7; }
+    .footer-small { font-size: 8.5px; color: #aaa8b9; }
   </style>
 </head>
 <body>
@@ -335,15 +336,15 @@
   <main class="container">
 
     <!-- Campus Inflation Card -->
-    <section class="card animate-slide-up" style="background: #f0edff; border: 1px solid #7665e8; margin-bottom: 20px; padding: 20px;">
-      <div class="section-heading" style="margin-bottom: 6px;">
+    <section class="card animate-slide-up" style="background: #f0edff; border: 1px solid #7665e8; margin-bottom: 14px; padding: 14px;">
+      <div class="section-heading" style="margin-bottom: 4px;">
         <span>⚡</span>
         <div>
-          <h2 style="font-size: 16px; color: #5542a0;">Live Campus Inflation Index <span class="help-icon" data-tooltip="Shows how much everyday campus prices have gone up so your budget stays realistic.">i</span></h2>
+          <h2 style="font-size: 11.5px; color: #5542a0;">Live Campus Inflation Index <span class="help-icon" data-tooltip="Shows how much everyday campus prices have gone up so your budget stays realistic.">i</span></h2>
           <p id="campus-inflation-status">Fetching API index...</p>
         </div>
       </div>
-      <p id="campus-inflation-advice" style="font-size: 12px; color: #6558e8; font-weight: 500;"></p>
+      <p id="campus-inflation-advice" style="font-size: 9.5px; color: #6558e8; font-weight: 500;"></p>
     </section>
 
     <!-- Form Card -->
@@ -424,15 +425,15 @@
 
       <!-- Risk Probability Score Card -->
       <div class="card animate-slide-up" style="background: #fff9f0; border: 1px solid #f39c12; animation-delay: 0.25s;">
-        <div class="section-heading" style="margin-bottom: 10px;">
+        <div class="section-heading" style="margin-bottom: 8px;">
           <span>⚠️</span>
           <div>
-            <h2 style="font-size: 16px; color: #d35400;">AI Risk Probability Score <span class="help-icon" data-tooltip="Chance of running out of money early based on how fast you spend compared to what you have.">i</span></h2>
+            <h2 style="font-size: 11.5px; color: #d35400;">AI Risk Probability Score <span class="help-icon" data-tooltip="Chance of running out of money early based on how fast you spend compared to what you have.">i</span></h2>
             <p>Calculated using regression & burn velocity metrics</p>
           </div>
         </div>
-        <h3 id="risk-score-display" style="font-size: 20px; color: #e67e22;">Analyzing...</h3>
-        <p id="risk-percentage-text" style="font-size: 12px; color: #7f8c8d; margin-top: 5px;"></p>
+        <h3 id="risk-score-display" style="font-size: 13px; color: #e67e22;">Analyzing...</h3>
+        <p id="risk-percentage-text" style="font-size: 9.5px; color: #7f8c8d; margin-top: 4px;"></p>
 
         <div class="risk-progress-container">
           <div id="risk-bar" class="risk-progress-bar"></div>
@@ -441,20 +442,20 @@
 
       <!-- Peer Rank Card -->
       <div class="card animate-slide-up" style="background: #eef9f2; border: 1px solid #2ed573; animation-delay: 0.3s;">
-        <div class="section-heading" style="margin-bottom: 10px;">
+        <div class="section-heading" style="margin-bottom: 8px;">
           <span>🏆</span>
           <div>
-            <h2 style="font-size: 16px; color: #1e8449;">Hostel Financial Rank <span class="help-icon" data-tooltip="How your allowance compares with other students in the saved data.">i</span></h2>
+            <h2 style="font-size: 11.5px; color: #1e8449;">Hostel Financial Rank <span class="help-icon" data-tooltip="How your allowance compares with other students in the saved data.">i</span></h2>
             <p>Benchmarked against student spending dataset</p>
           </div>
         </div>
-        <h3 id="peer-rank-display" style="font-size: 22px; color: #27ae60;">Calculating...</h3>
+        <h3 id="peer-rank-display" style="font-size: 14px; color: #27ae60;">Calculating...</h3>
       </div>
 
       <!-- Survival Card & Prediction List -->
       <div class="survival-card card animate-slide-up" style="animation-delay: 0.35s;">
-        <h2>🍜 Instant Noodle Survival Plan</h2>
-        <p id="survival-message"></p>
+        <h2 style="font-size: 13px;">🍜 Instant Noodle Survival Plan</h2>
+        <p id="survival-message" style="font-size: 10px; margin-top: 4px;"></p>
 
         <div class="budget-highlight">
           <p>Recommended Safe Daily Budget <span class="help-icon" data-tooltip="The amount you can spend each day so your money lasts until your next allowance.">i</span></p>
