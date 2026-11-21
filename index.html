@@ -404,9 +404,7 @@
 
   <script>
     // Direct local FastAPI URL (works whether served from http://127.0.0.1:8000/ or opened locally)
-    const API_BASE_URL = window.location.protocol.startsWith("http") && window.location.port === "8000"
-      ? window.location.origin
-      : "http://127.0.0.1:8000";
+    const DEFAULT_HOSTED_API_URL = "https://backendforbrokemeter.onrender.com/";
 
     const statusDot = document.getElementById("status-dot");
     const statusText = document.getElementById("status-text");
