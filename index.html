@@ -98,35 +98,39 @@
       box-shadow: 0 12px 35px rgba(45, 39, 100, 0.1);
     }
 
-    /* Tiny Help Tooltip Symbol Styling */
+    /* Tiny Help Letter "i" Styling */
     .help-icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 10px;
-      height: 10px;
-      background: #eef2ff;
-      color: #6c5ce7;
-      border-radius: 50%;
-      font-size: 6.5px;
-      line-height: 1;
-      font-weight: 700;
+      display: inline;
+      font-family: Georgia, "Times New Roman", serif;
+      font-style: italic;
+      font-size: 8.5px;
+      font-weight: 600;
+      color: #7c6ee6;
+      opacity: 0.75;
       cursor: help;
-      margin-left: 3px;
+      margin-left: 2px;
       position: relative;
-      vertical-align: middle;
+      vertical-align: super;
+      line-height: 1;
+    }
+
+    .help-icon:hover {
+      opacity: 1;
+      color: #5544d1;
     }
 
     .help-icon:hover::after {
       content: attr(data-tooltip);
       position: absolute;
-      bottom: 135%;
+      bottom: 140%;
       left: 50%;
       transform: translateX(-50%);
       background: #292449;
       color: white;
       padding: 8px 12px;
       border-radius: 8px;
+      font-family: 'Poppins', Arial, sans-serif;
+      font-style: normal;
       font-size: 11px;
       font-weight: 400;
       width: 220px;
@@ -192,7 +196,7 @@
     .calc-modal-card {
       background: white;
       width: 100%;
-      max-width: 400px;
+      max-width: 410px;
       border-radius: 20px;
       padding: 28px 24px;
       text-align: center;
@@ -588,7 +592,7 @@
       const leftover = Math.max(0, allowance - bills);
       const avgDaily = (weekdaySpend * 5 + weekendSpend * 2) / 7;
 
-      calcModalTitle.textContent = "Crunching Your Numbers...";
+      calcModalTitle.textContent = "Checking Your Wallet...";
       calcModalSub.textContent = `Leftover after bills: ${formatMoney(leftover)} · Avg daily spend: ~${formatMoney(avgDaily)}`;
 
       if (leftover === 0) {
@@ -668,7 +672,7 @@
               weekend_spending: weekendSpend
             })
           }),
-          new Promise((resolve) => setTimeout(resolve, 650))
+          new Promise((resolve) => setTimeout(resolve, 1600))
         ]);
 
         const apiData = await response.json();
