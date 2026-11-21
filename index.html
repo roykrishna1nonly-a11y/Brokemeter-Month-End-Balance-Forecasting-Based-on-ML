@@ -103,15 +103,16 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 13px;
-      height: 13px;
+      width: 10px;
+      height: 10px;
       background: #eef2ff;
       color: #6c5ce7;
       border-radius: 50%;
-      font-size: 8px;
+      font-size: 6.5px;
+      line-height: 1;
       font-weight: 700;
       cursor: help;
-      margin-left: 4px;
+      margin-left: 3px;
       position: relative;
       vertical-align: middle;
     }
@@ -119,7 +120,7 @@
     .help-icon:hover::after {
       content: attr(data-tooltip);
       position: absolute;
-      bottom: 125%;
+      bottom: 135%;
       left: 50%;
       transform: translateX(-50%);
       background: #292449;
@@ -170,6 +171,76 @@
     .calculate-btn { background: #6c5ce7; color: white; margin-top: 8px; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3); }
     .calculate-btn:hover { background: #5544d1; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(108, 92, 231, 0.4); }
     .calculate-btn:active { transform: scale(0.98); }
+
+    /* Calculating Popup Modal */
+    .calc-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(25, 22, 54, 0.55);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 999;
+    }
+
+    .calc-modal-backdrop.hidden {
+      display: none;
+    }
+
+    .calc-modal-card {
+      background: white;
+      width: 100%;
+      max-width: 400px;
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-align: center;
+      box-shadow: 0 18px 45px rgba(25, 22, 54, 0.25);
+      animation: modalPop 0.25s ease-out;
+    }
+
+    @keyframes modalPop {
+      from { opacity: 0; transform: scale(0.94) translateY(8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .calc-spinner {
+      width: 42px;
+      height: 42px;
+      border: 4px solid #ece9ff;
+      border-top-color: #6c5ce7;
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      animation: spinLoader 0.8s linear infinite;
+    }
+
+    @keyframes spinLoader {
+      to { transform: rotate(360deg); }
+    }
+
+    .calc-modal-card h3 {
+      font-size: 18px;
+      color: #25243a;
+      margin-bottom: 8px;
+    }
+
+    .calc-modal-note {
+      font-size: 13px;
+      color: #6558e8;
+      font-weight: 500;
+      background: #f4f2ff;
+      padding: 12px 14px;
+      border-radius: 12px;
+      margin-top: 12px;
+      line-height: 1.5;
+    }
+
+    .calc-modal-sub {
+      font-size: 12px;
+      color: #85849a;
+      margin-top: 6px;
+    }
 
     .results { margin-top: 28px; }
     .hidden { display: none; }
@@ -263,10 +334,10 @@
 
     <!-- Campus Inflation Card -->
     <section class="card animate-slide-up" style="background: #f0edff; border: 1px solid #7665e8; margin-bottom: 20px; padding: 20px;">
-      <div class="section-heading" style="margin-bottom: 10px;">
+      <div class="section-heading" style="margin-bottom: 6px;">
         <span>⚡</span>
         <div>
-          <h2 style="font-size: 16px; color: #5542a0;">Live Campus Inflation Index <span class="help-icon" data-tooltip="Reflects ongoing cost-of-living adjustments pulled from market trends to keep your budget realistic.">i</span></h2>
+          <h2 style="font-size: 16px; color: #5542a0;">Live Campus Inflation Index <span class="help-icon" data-tooltip="Shows how much everyday campus prices have gone up so your budget stays realistic.">i</span></h2>
           <p id="campus-inflation-status">Fetching API index...</p>
         </div>
       </div>
@@ -278,7 +349,7 @@
       <div class="section-heading">
         <span>🧮</span>
         <div>
-          <h2>Calculate Financial Forecast <span class="help-icon" data-tooltip="Input your monthly numbers to process them through your trained machine learning model.">i</span></h2>
+          <h2>Calculate Financial Forecast <span class="help-icon" data-tooltip="Enter your monthly money and daily spending to see how long your balance will last.">i</span></h2>
           <p id="api-endpoint-label">Connected To BackendForBrokemeter</p>
         </div>
       </div>
@@ -318,11 +389,21 @@
       </form>
     </section>
 
+    <!-- Calculating Popup Window -->
+    <div id="calc-modal" class="calc-modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="calc-modal-title">
+      <div class="calc-modal-card">
+        <div class="calc-spinner"></div>
+        <h3 id="calc-modal-title">Checking Your Wallet...</h3>
+        <p id="calc-modal-sub" class="calc-modal-sub">Adding up your bills and daily expenses</p>
+        <p id="calc-modal-note" class="calc-modal-note">Hang tight while we check how long your money can stretch.</p>
+      </div>
+    </div>
+
     <!-- Results Section -->
     <section id="results" class="results hidden" aria-live="polite">
 
       <div id="main-result-card" class="result-card main-result animate-slide-up">
-        <p class="result-label">YOUR MONEY WILL RUN OUT ON <span class="help-icon" data-tooltip="The exact calendar date your spendable balance is mathematically projected to hit zero based on your daily burn rate.">i</span></p>
+        <p class="result-label">YOUR MONEY WILL RUN OUT ON <span class="help-icon" data-tooltip="The date your leftover money is expected to reach zero if you keep spending at your current pace.">i</span></p>
         <h2 id="zero-date">--</h2>
         <p id="result-message"></p>
       </div>
@@ -330,13 +411,13 @@
       <div class="stats-grid">
         <div class="stat-card card animate-slide-up" style="animation-delay: 0.15s;">
           <span>💰</span>
-          <p>Spendable Balance <span class="help-icon" data-tooltip="Total allowance remaining after paying your fixed monthly recurring bills.">i</span></p>
+          <p>Spendable Balance <span class="help-icon" data-tooltip="Money left in hand after subtracting your fixed monthly bills.">i</span></p>
           <h3 id="remaining-money">₹0</h3>
         </div>
 
         <div class="stat-card card animate-slide-up" style="animation-delay: 0.2s;">
           <span>⏳</span>
-          <p>ML Forecasted Days <span class="help-icon" data-tooltip="Total number of survival days predicted by your Scikit-Learn .pkl regression pipeline.">i</span></p>
+          <p>ML Forecasted Days <span class="help-icon" data-tooltip="Estimated number of days your leftover money can last.">i</span></p>
           <h3 id="days-left">--</h3>
         </div>
       </div>
@@ -346,7 +427,7 @@
         <div class="section-heading" style="margin-bottom: 10px;">
           <span>⚠️</span>
           <div>
-            <h2 style="font-size: 16px; color: #d35400;">AI Risk Probability Score <span class="help-icon" data-tooltip="Statistical probability percentage of running out of money early, calculated using burn ratio and dataset benchmarks.">i</span></h2>
+            <h2 style="font-size: 16px; color: #d35400;">AI Risk Probability Score <span class="help-icon" data-tooltip="Chance of running out of money early based on how fast you spend compared to what you have.">i</span></h2>
             <p>Calculated using regression & burn velocity metrics</p>
           </div>
         </div>
@@ -363,7 +444,7 @@
         <div class="section-heading" style="margin-bottom: 10px;">
           <span>🏆</span>
           <div>
-            <h2 style="font-size: 16px; color: #1e8449;">Hostel Financial Rank <span class="help-icon" data-tooltip="Your budget tier percentile computed by comparing your allowance against logged student records in your CSV dataset.">i</span></h2>
+            <h2 style="font-size: 16px; color: #1e8449;">Hostel Financial Rank <span class="help-icon" data-tooltip="How your allowance compares with other students in the saved data.">i</span></h2>
             <p>Benchmarked against student spending dataset</p>
           </div>
         </div>
@@ -376,14 +457,14 @@
         <p id="survival-message"></p>
 
         <div class="budget-highlight">
-          <p>Recommended Safe Daily Budget <span class="help-icon" data-tooltip="The exact maximum amount you can spend per day to safely make your spendable balance last until your next allowance cycle.">i</span></p>
+          <p>Recommended Safe Daily Budget <span class="help-icon" data-tooltip="The amount you can spend each day so your money lasts until your next allowance.">i</span></p>
           <h3 id="recommended-budget">₹0</h3>
         </div>
 
         <p id="budget-advice" class="advice"></p>
 
         <div class="prediction-list">
-          <h3>📊 Regression Prediction Breakdown <span class="help-icon" data-tooltip="Granular mathematical breakdown of your monthly velocity and projected savings surplus or deficit.">i</span></h3>
+          <h3>📊 Regression Prediction Breakdown <span class="help-icon" data-tooltip="Simple summary of your monthly spending pace and whether you end up saving or falling short.">i</span></h3>
           <ul>
             <li>Estimated monthly total burn velocity: <strong id="pred-monthly-burn">--</strong></li>
             <li>Recommended maximum weekend outing limit: <strong id="pred-weekend-cap">--</strong></li>
@@ -467,13 +548,13 @@
         if (response.ok) {
           const data = await response.json();
           document.getElementById("campus-inflation-status").textContent = `Inflation Index: +${data.inflation_percentage}%`;
-          document.getElementById("campus-inflation-advice").textContent = data.advisory;
+          document.getElementById("campus-inflation-advice").textContent = "";
         } else {
           throw new Error("Failed inflation fetch");
         }
       } catch (e) {
         document.getElementById("campus-inflation-status").textContent = "Standard Price Index (API Unreachable)";
-        document.getElementById("campus-inflation-advice").textContent = `Unable to reach ${API_BASE_URL}. Render may still be spinning up or deploying.`;
+        document.getElementById("campus-inflation-advice").textContent = "";
       }
     }
     loadCampusInflation();
@@ -490,12 +571,41 @@
     const resetButton = document.getElementById("reset-btn");
     const startDateInput = document.getElementById("start-date");
 
+    const calcModal = document.getElementById("calc-modal");
+    const calcModalTitle = document.getElementById("calc-modal-title");
+    const calcModalSub = document.getElementById("calc-modal-sub");
+    const calcModalNote = document.getElementById("calc-modal-note");
+
     function formatMoney(amount) {
       return new Intl.NumberFormat("en-IN", {
         style: "currency",
         currency: "INR",
         maximumFractionDigits: 2
       }).format(amount);
+    }
+
+    function showCalcPopup(allowance, bills, weekdaySpend, weekendSpend) {
+      const leftover = Math.max(0, allowance - bills);
+      const avgDaily = (weekdaySpend * 5 + weekendSpend * 2) / 7;
+
+      calcModalTitle.textContent = "Crunching Your Numbers...";
+      calcModalSub.textContent = `Leftover after bills: ${formatMoney(leftover)} · Avg daily spend: ~${formatMoney(avgDaily)}`;
+
+      if (leftover === 0) {
+        calcModalNote.textContent = "Looks like your monthly bills take up all of your allowance. Checking what that means for your month...";
+      } else if (weekendSpend > weekdaySpend * 2) {
+        calcModalNote.textContent = "Weekend outings look noticeably higher than weekday spending. Checking how fast that eats into your balance...";
+      } else if (avgDaily > leftover / 30) {
+        calcModalNote.textContent = "Your daily spending is faster than a steady 30-day pace. Checking when your money might run out...";
+      } else {
+        calcModalNote.textContent = "Your daily spending looks fairly steady. Checking if it can carry you through the month...";
+      }
+
+      calcModal.classList.remove("hidden");
+    }
+
+    function hideCalcPopup() {
+      calcModal.classList.add("hidden");
     }
 
     function animateValue(element, start, end, duration, isCurrency = true) {
@@ -543,22 +653,28 @@
         return;
       }
 
+      showCalcPopup(allowance, bills, weekdaySpend, weekendSpend);
+
       try {
-        const response = await fetchWithTimeout(`${API_BASE_URL}/api/predict`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            allowance: allowance,
-            bills: bills,
-            daily_spending: (weekdaySpend * 5 + weekendSpend * 2) / 7,
-            weekday_spending: weekdaySpend,
-            weekend_spending: weekendSpend
-          })
-        });
+        const [response] = await Promise.all([
+          fetchWithTimeout(`${API_BASE_URL}/api/predict`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              allowance: allowance,
+              bills: bills,
+              daily_spending: (weekdaySpend * 5 + weekendSpend * 2) / 7,
+              weekday_spending: weekdaySpend,
+              weekend_spending: weekendSpend
+            })
+          }),
+          new Promise((resolve) => setTimeout(resolve, 650))
+        ]);
 
         const apiData = await response.json();
 
         if (!response.ok) {
+          hideCalcPopup();
           alert(apiData.detail || "Prediction error occurred.");
           return;
         }
@@ -569,6 +685,8 @@
         const nextAllowanceDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 1);
         const daysInCycle = Math.max(1, Math.round((nextAllowanceDate - startDate) / (1000 * 60 * 60 * 24)));
         const safeDailyBudget = daysInCycle > 0 ? balance / daysInCycle : 0;
+
+        hideCalcPopup();
 
         animateValue(remainingMoney, 0, balance, 800, true);
         animateValue(recommendedBudget, 0, safeDailyBudget, 800, true);
@@ -628,6 +746,7 @@
         results.scrollIntoView({ behavior: "smooth", block: "start" });
 
       } catch (err) {
+        hideCalcPopup();
         console.error("API error:", err);
         alert(`Failed to connect to FastAPI backend at ${API_BASE_URL}. Please try again in a few seconds if Render is waking up.`);
       }
