@@ -450,7 +450,7 @@
         if (response.ok) {
           const data = await response.json();
           statusDot.classList.add("online");
-          statusText.textContent = data.model_loaded ? "API Online (ML)" : "API Online";
+          statusText.textContent = data.model_loaded ? "API Online" : "API Online";
         } else {
           throw new Error("Non-200 health response");
         }
