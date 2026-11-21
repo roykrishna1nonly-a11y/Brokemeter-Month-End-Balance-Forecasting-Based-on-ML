@@ -176,7 +176,7 @@
     .calculate-btn:hover { background: #5544d1; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(108, 92, 231, 0.4); }
     .calculate-btn:active { transform: scale(0.98); }
 
-    /* Calculating Popup Modal */
+    /* Loading Popup Modal */
     .calc-modal-backdrop {
       position: fixed;
       inset: 0;
@@ -196,7 +196,7 @@
     .calc-modal-card {
       background: white;
       width: 100%;
-      max-width: 320px;
+      max-width: 300px;
       border-radius: 20px;
       padding: 32px 24px;
       text-align: center;
@@ -376,11 +376,11 @@
       </form>
     </section>
 
-    <!-- Calculating Popup Window -->
+    <!-- Loading Popup Window -->
     <div id="calc-modal" class="calc-modal-backdrop hidden" role="dialog" aria-modal="true">
       <div class="calc-modal-card">
         <div class="calc-spinner"></div>
-        <p class="calc-word">Calculating</p>
+        <p class="calc-word">Loading...</p>
       </div>
     </div>
 
@@ -634,7 +634,7 @@
               weekend_spending: weekendSpend
             })
           }),
-          new Promise((resolve) => setTimeout(resolve, 1600))
+          new Promise((resolve) => setTimeout(resolve, 1000))
         ]);
 
         const apiData = await response.json();
