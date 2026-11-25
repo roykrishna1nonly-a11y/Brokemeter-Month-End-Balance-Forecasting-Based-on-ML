@@ -9,10 +9,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
 :root{--ink:#0b2e18;--teal:#16a34a;--teal-d:#166534;--mint:#e7f6ea;--bg:#f1f8f2;--amber:#ffb020;--coral:#ff5a4e;--muted:#5d7f64;--line:#d2e6d6;--ease:cubic-bezier(.16,1,.3,1)}
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
 body{font-family:'Outfit',Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;overflow-x:hidden}
 .ic{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
 #progress{position:fixed;top:0;left:0;height:4px;width:100%;background:linear-gradient(90deg,var(--amber),var(--coral));transform-origin:left;transform:scaleX(0);z-index:1000}
+
+/* nav */
+.nav{position:fixed;top:0;left:0;right:0;z-index:900;display:flex;align-items:center;justify-content:space-between;padding:12px 4vw;background:rgba(255,255,255,.12);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.2);color:#fff;transition:background .3s,color .3s,box-shadow .3s}
+.nav.scrolled{background:rgba(255,255,255,.9);color:var(--ink);box-shadow:0 4px 20px rgba(11,46,24,.1)}
+.brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:19px;color:inherit;text-decoration:none}
+.brand .ic{font-size:24px}
+.nav-links{display:flex;gap:26px}
+.nav-links a{color:inherit;text-decoration:none;font-size:14px;font-weight:500;opacity:.9;transition:opacity .2s}
+.nav-links a:hover{opacity:1;text-decoration:underline;text-underline-offset:6px}
 
 /* hero */
 .hero{background:linear-gradient(135deg,#166534,#16a34a,#14532d);background-size:200% 200%;animation:shift 14s ease infinite;color:#fff;text-align:center;padding:90px 20px 150px;position:relative;overflow:hidden;min-height:92vh;display:flex;align-items:center;justify-content:center}
@@ -145,50 +154,6 @@ footer{text-align:center;padding:70px 10px 40px;color:var(--muted);font-size:13p
 footer .ic{font-size:34px;color:var(--teal);display:block;margin:0 auto 8px}
 .footer-small{font-size:11px;color:#9ab7a0}
 
-
-html{scroll-padding-top:70px}
-.nav{position:fixed;top:0;left:0;right:0;z-index:900;display:flex;align-items:center;justify-content:space-between;padding:12px 4vw;background:rgba(255,255,255,.12);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.2);color:#fff;transition:background .3s,color .3s,box-shadow .3s}
-.nav.scrolled{background:rgba(255,255,255,.9);color:var(--ink);box-shadow:0 4px 20px rgba(11,46,24,.1)}
-.brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:19px;color:inherit;text-decoration:none}
-.brand .ic{font-size:24px}
-.nav-links{display:flex;gap:26px}
-.nav-links a{color:inherit;text-decoration:none;font-size:14px;font-weight:500;opacity:.9;transition:opacity .2s}
-.nav-links a:hover{opacity:1;text-decoration:underline;text-underline-offset:6px}
-.user{position:relative}
-.user-btn{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:30px;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.15);color:inherit;font:inherit;font-size:13px;font-weight:600;cursor:pointer}
-.nav.scrolled .user-btn{border-color:var(--line);background:var(--mint)}
-.avatar{width:28px;height:28px;border-radius:50%;background:var(--amber);color:#3a2500;display:grid;place-items:center;font-weight:800;font-size:13px}
-.menu{position:absolute;right:0;top:130%;width:250px;background:#fff;color:var(--ink);border-radius:14px;box-shadow:0 18px 44px rgba(11,46,24,.22);padding:16px;opacity:0;visibility:hidden;transform:translateY(-8px);transition:all .25s var(--ease)}
-.menu.open{opacity:1;visibility:visible;transform:none}
-.menu .who{display:flex;gap:10px;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:12px}
-.menu .who .avatar{width:40px;height:40px;font-size:18px}
-.menu b{display:block;font-size:14px;word-break:break-all}
-.menu small{color:var(--muted);font-size:12px}
-.menu button{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;border:none;border-radius:10px;background:var(--mint);color:var(--teal-d);font:inherit;font-weight:700;font-size:13px;cursor:pointer}
-.menu button:hover{background:#cfead6}
-.auth{position:fixed;inset:0;z-index:5000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(8,40,20,.38);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-.auth.hidden{display:none}
-.auth-card{width:100%;max-width:400px;padding:34px 28px;border-radius:24px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.38);box-shadow:0 24px 60px rgba(0,0,0,.28);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);color:#fff;animation:up .7s var(--ease) both}
-.auth-card .logo{width:64px;height:64px;font-size:34px;border-radius:18px;margin-bottom:10px;animation:none}
-.auth-card h2{font-size:26px;text-align:center}
-.auth-card>p{text-align:center;font-size:13px;opacity:.85;margin:4px 0 18px}
-.tabs{display:grid;grid-template-columns:1fr 1fr;background:rgba(255,255,255,.14);border-radius:12px;padding:4px;margin-bottom:16px}
-.tabs button{padding:9px;border:none;border-radius:9px;background:transparent;color:#fff;font:inherit;font-weight:600;font-size:13px;cursor:pointer;transition:all .25s}
-.tabs button.on{background:rgba(255,255,255,.92);color:var(--teal-d)}
-.field{position:relative;margin-bottom:12px}
-.field .ic{position:absolute;left:13px;top:50%;margin-top:-9px;font-size:18px;opacity:.8}
-.field input{width:100%;padding:13px 13px 13px 42px;border-radius:12px;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.12);color:#fff;font:inherit;font-size:14px;outline:none;transition:all .2s}
-.field input::placeholder{color:rgba(255,255,255,.65)}
-.field input:focus{background:rgba(255,255,255,.22);border-color:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.15)}
-.auth-err{min-height:18px;font-size:12px;color:#ffd0cb;margin-bottom:8px}
-.auth-btn{width:100%;padding:14px;border:none;border-radius:12px;font:inherit;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .2s}
-.auth-btn:hover{transform:translateY(-2px)}
-.auth-btn.main{background:var(--amber);color:#3a2500}
-.auth-btn.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.5);margin-top:10px}
-.or{text-align:center;font-size:12px;opacity:.75;margin:14px 0 0}
-.auth-note{font-size:11px;opacity:.7;text-align:center;margin-top:14px;line-height:1.5}
-@media(max-width:720px){.nav-links{display:none}}
-
 .split{display:grid;grid-template-columns:1fr 1fr;gap:38px;align-items:center}
 .split .sec-title,.split .sec-sub{text-align:left;margin-left:0}
 .split .sec-sub{margin-bottom:16px}
@@ -240,36 +205,7 @@ html{scroll-padding-top:70px}
   <div class="nav-links">
     <a href="#calculator">Calculator</a><a href="#how">How it works</a><a href="#tips">Tips</a><a href="#faq">FAQ</a>
   </div>
-  <div class="user">
-    <button class="user-btn" id="userBtn" type="button" aria-haspopup="true" aria-expanded="false">
-      <span class="avatar" id="userAvatar">G</span><span id="userName">Guest</span><svg class="ic"><use href="#i-chev"/></svg>
-    </button>
-    <div class="menu" id="userMenu">
-      <div class="who"><span class="avatar" id="menuAvatar">G</span><div><b id="menuEmail">Guest</b><small id="menuType">Guest account</small></div></div>
-      <button type="button" id="logoutBtn"><svg class="ic"><use href="#i-logout"/></svg><span id="logoutText">Log out</span></button>
-    </div>
-  </div>
 </nav>
-
-<div class="auth hidden" id="auth" role="dialog" aria-modal="true" aria-labelledby="authTitle">
-  <div class="auth-card">
-    <div style="text-align:center"><div class="logo"><svg class="ic"><use href="#i-coin"/></svg></div></div>
-    <h2 id="authTitle">Welcome back</h2>
-    <p id="authSub">Sign in to continue to BrokeMeter.</p>
-    <div class="tabs"><button type="button" id="tabIn" class="on">Sign in</button><button type="button" id="tabUp">Create account</button></div>
-    <form id="authForm" novalidate>
-      <div class="field"><svg class="ic"><use href="#i-mail"/></svg><input type="email" id="authEmail" placeholder="Email address" autocomplete="email"></div>
-      <div class="field"><svg class="ic"><use href="#i-lock"/></svg><input type="password" id="authPass" placeholder="Password" autocomplete="current-password"></div>
-      <div class="field hidden" id="confirmWrap"><svg class="ic"><use href="#i-lock"/></svg><input type="password" id="authConfirm" placeholder="Confirm password" autocomplete="new-password"></div>
-      <p class="auth-err" id="authErr" role="alert"></p>
-      <button class="auth-btn main" type="submit" id="authSubmit">Sign in</button>
-    </form>
-    <p class="or">or</p>
-    <button class="auth-btn ghost" type="button" id="guestBtn"><svg class="ic"><use href="#i-user"/></svg>Continue as guest</button>
-    <p class="auth-note">Accounts are saved in the BrokeMeter database. If the server is unreachable, your account is saved on this device instead.</p>
-  </div>
-</div>
-
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
 <symbol id="i-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 8h6M9 11h6M10 8c4 0 4 5 0 5l4 4"/></symbol>
@@ -296,10 +232,6 @@ html{scroll-padding-top:70px}
 <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6zM9 12l2 2 4-4"/></symbol>
 <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></symbol>
 <symbol id="i-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
-<symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></symbol>
-<symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></symbol>
-<symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
-<symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
 <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-4 3-6 7-6s7 2 7 6M17 5a3.5 3.5 0 0 1 0 7M22 20c0-3-2-5-4-5.5"/></symbol>
 </svg>
 
@@ -911,129 +843,6 @@ resetButton.addEventListener("click", function() {
   window.addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
   window.addEventListener("resize", update);
   update();
-})();
-
-/* ---------- login + user menu (MySQL-backed API) ---------- */
-(function () {
-  const $ = (id) => document.getElementById(id);
-  const SESS = "BROKEMETER_USER";
-  let mode = "in", busy = false;
-  localStorage.removeItem("BROKEMETER_USERS");   // old browser-only accounts
-  const readSess = () => { try { return JSON.parse(localStorage.getItem(SESS)); } catch (_) { return null; } };
-
-  async function api(path, body, token) {
-    const res = await fetchWithTimeout(`${API_BASE_URL}${path}`, {
-      method: body ? "POST" : "GET",
-      headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-      body: body ? JSON.stringify(body) : undefined
-    }, 20000);
-    let data = {};
-    try { data = await res.json(); } catch (_) {}
-    if (!res.ok) {
-      const msg = typeof data.detail === "string" ? data.detail : "Please check your details and try again.";
-      throw Object.assign(new Error(msg), { status: res.status });
-    }
-    return data;
-  }
-
-  /* Fallback: if the login server is unreachable, accounts are kept on this device */
-  const LOCAL = "BROKEMETER_LOCAL_USERS";
-  const localUsers = () => { try { return JSON.parse(localStorage.getItem(LOCAL)) || {}; } catch (_) { return {}; } };
-  const isDown = (ex) => !ex.status || ex.status === 404 || ex.status === 405 || ex.status >= 500;
-  async function hashPw(pw, salt) {
-    const txt = salt + pw;
-    if (window.crypto && crypto.subtle) {
-      const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(txt));
-      return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join("");
-    }
-    return btoa(unescape(encodeURIComponent(txt)));
-  }
-  const fail = (status, msg) => Object.assign(new Error(msg), { status });
-  async function localRegister(email, pw) {
-    const u = localUsers();
-    if (u[email]) throw fail(409, "An account with this email already exists. Sign in instead.");
-    const salt = [...crypto.getRandomValues(new Uint8Array(12))].map((x) => x.toString(16).padStart(2, "0")).join("");
-    u[email] = { salt, hash: await hashPw(pw, salt) };
-    localStorage.setItem(LOCAL, JSON.stringify(u));
-  }
-  async function localLogin(email, pw) {
-    const u = localUsers()[email];
-    if (!u) throw fail(503, "The login server is unreachable and no account for this email is saved on this device. Try again in a few seconds, or continue as guest.");
-    if (u.hash !== await hashPw(pw, u.salt)) throw fail(401, "Incorrect email or password.");
-  }
-
-  function submitLabel() { return mode === "up" ? "Create account" : "Sign in"; }
-  function setBusy(on) {
-    busy = on;
-    $("authSubmit").disabled = on;
-    $("authSubmit").textContent = on ? (mode === "up" ? "Creating account..." : "Signing in...") : submitLabel();
-  }
-  function setMode(m) {
-    mode = m; const up = m === "up";
-    $("tabIn").classList.toggle("on", !up); $("tabUp").classList.toggle("on", up);
-    $("confirmWrap").classList.toggle("hidden", !up);
-    $("authTitle").textContent = up ? "Create your account" : "Welcome back";
-    $("authSub").textContent = up ? "It takes a few seconds." : "Sign in to continue to BrokeMeter.";
-    $("authSubmit").textContent = submitLabel();
-    $("authPass").autocomplete = up ? "new-password" : "current-password";
-    $("authErr").textContent = "";
-  }
-  function render() {
-    const s = readSess(), box = $("auth");
-    if (!s) { box.classList.remove("hidden"); document.body.style.overflow = "hidden"; return; }
-    box.classList.add("hidden"); document.body.style.overflow = "";
-    const guest = s.type === "guest", name = guest ? "Guest" : s.email.split("@")[0];
-    const ini = name.charAt(0).toUpperCase();
-    $("userName").textContent = name.length > 14 ? name.slice(0, 13) + "…" : name;
-    $("userAvatar").textContent = ini; $("menuAvatar").textContent = ini;
-    $("menuEmail").textContent = guest ? "Guest" : s.email;
-    $("menuType").textContent = guest ? "Guest account" : s.local ? "Member account (saved on this device)" : "Member account";
-    $("logoutText").textContent = guest ? "Sign in or create account" : "Log out";
-  }
-  function start(sess) { localStorage.setItem(SESS, JSON.stringify(sess)); render(); window.scrollTo(0, 0); }
-
-  $("tabIn").onclick = () => setMode("in");
-  $("tabUp").onclick = () => setMode("up");
-  $("guestBtn").onclick = () => start({ type: "guest" });
-
-  $("authForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    if (busy) return;
-    const email = $("authEmail").value.trim().toLowerCase(), pw = $("authPass").value, err = $("authErr");
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { err.textContent = "Enter a valid email address."; return; }
-    if (pw.length < 8) { err.textContent = "Password must be at least 8 characters."; return; }
-    if (pw.length > 72) { err.textContent = "Password must be 72 characters or fewer."; return; }
-    if (mode === "up" && pw !== $("authConfirm").value) { err.textContent = "Passwords do not match."; return; }
-    err.textContent = "";
-    setBusy(true);
-    try {
-      let data = null;
-      try {
-        data = await api(mode === "up" ? "/api/register" : "/api/login", { email, password: pw });
-      } catch (ex) {
-        if (mode === "in" && ex.status === 401) { await localLogin(email, pw).catch(() => { throw ex; }); }
-        else if (isDown(ex)) { await (mode === "up" ? localRegister : localLogin)(email, pw); }
-        else throw ex;
-      }
-      $("authForm").reset();
-      start(data ? { type: "member", email: data.user.email, token: data.token } : { type: "member", email, local: true });
-    } catch (ex) {
-      err.textContent = ex.status ? ex.message : "Something went wrong. Please try again.";
-    } finally { setBusy(false); }
-  });
-
-  const menu = $("userMenu"), btn = $("userBtn");
-  const closeMenu = () => { menu.classList.remove("open"); btn.setAttribute("aria-expanded", "false"); };
-  btn.onclick = (e) => { e.stopPropagation(); const o = menu.classList.toggle("open"); btn.setAttribute("aria-expanded", o); };
-  document.addEventListener("click", (e) => { if (!menu.contains(e.target)) closeMenu(); });
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeMenu(); });
-  $("logoutBtn").onclick = () => { closeMenu(); localStorage.removeItem(SESS); setMode("in"); window.scrollTo(0, 0); render(); };
-
-  render();
-  const s0 = readSess();   // drop expired sessions, but keep them if the server is just asleep
-  if (s0 && s0.type === "member" && s0.token) {
-    api("/api/me", null, s0.token).catch((ex) => { if (ex.status === 401) { localStorage.removeItem(SESS); render(); } });
-  }
 })();
 
 /* ---------- quick reality check ---------- */
