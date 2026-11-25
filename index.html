@@ -1,882 +1,1058 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="api-base-url" content="https://backendforbrokemeter.onrender.com">
-  <title>BrokeMeter - Advanced Analytics & Forecasting</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="api-base-url" content="https://backendforbrokemeter.onrender.com">
+<title>BrokeMeter - Advanced Analytics & Forecasting</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
+:root{--ink:#0b2e18;--teal:#16a34a;--teal-d:#166534;--mint:#e7f6ea;--bg:#f1f8f2;--amber:#ffb020;--coral:#ff5a4e;--muted:#5d7f64;--line:#d2e6d6;--ease:cubic-bezier(.16,1,.3,1)}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',Arial,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;overflow-x:hidden}
+.ic{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+#progress{position:fixed;top:0;left:0;height:4px;width:100%;background:linear-gradient(90deg,var(--amber),var(--coral));transform-origin:left;transform:scaleX(0);z-index:1000}
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+/* hero */
+.hero{background:linear-gradient(135deg,#166534,#16a34a,#14532d);background-size:200% 200%;animation:shift 14s ease infinite;color:#fff;text-align:center;padding:90px 20px 150px;position:relative;overflow:hidden;min-height:92vh;display:flex;align-items:center;justify-content:center}
+@keyframes shift{50%{background-position:100% 50%}}
+.hero-inner{position:relative;z-index:2;max-width:720px}
+.coin{position:absolute;z-index:1;will-change:transform}
+.coin span{display:grid;place-items:center;width:var(--s);height:var(--s);border-radius:50%;background:radial-gradient(circle at 30% 30%,#ffd56b,var(--amber));color:#7a4b00;font-weight:800;font-size:calc(var(--s)*.5);box-shadow:inset 0 -4px 0 rgba(0,0,0,.12),0 10px 24px rgba(0,0,0,.2);animation:bob var(--t) ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-16px) rotate(12deg)}}
+.api-status-banner{display:none!important;position:absolute;top:15px;right:20px;z-index:3;background:rgba(255,255,255,.15);backdrop-filter:blur(6px);padding:6px 14px;border-radius:20px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,.25)}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--coral)}
+.status-dot.online{background:#2ed573;animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(46,213,115,.7)}70%{box-shadow:0 0 0 7px rgba(46,213,115,0)}100%{box-shadow:0 0 0 0 rgba(46,213,115,0)}}
+.logo{display:inline-grid;place-items:center;width:84px;height:84px;border-radius:24px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);font-size:44px;margin-bottom:16px;animation:float 3s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-9px)}}
+.tagline{font-size:12px;font-weight:600;letter-spacing:3px;opacity:.85}
+.hero h1{font-size:clamp(34px,7vw,62px);margin:14px 0;font-weight:800;line-height:1.05}
+.subtitle{max-width:560px;margin:auto;font-size:16px;line-height:1.7;opacity:.92}
+.chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:24px 0}
+.chips span{display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:30px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);font-size:13px;font-weight:500}
+.cta{display:inline-flex;align-items:center;gap:8px;background:var(--amber);color:#3a2500;font-weight:700;padding:14px 26px;border-radius:12px;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.2);transition:transform .2s}
+.cta:hover{transform:translateY(-3px)}
+.scroll-cue{position:absolute;bottom:92px;left:50%;margin-left:-14px;z-index:2;font-size:28px;opacity:.8;animation:cue 1.6s ease-in-out infinite}
+@keyframes cue{50%{transform:translateY(10px)}}
+.wave{position:absolute;bottom:-1px;left:0;width:100%;height:80px;z-index:2}
 
-    body {
-      font-family: 'Poppins', Arial, sans-serif;
-      background: #f4f5ff;
-      color: #25243a;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
+.container{width:90%;max-width:760px;margin:30px auto 0;position:relative;z-index:5;padding-bottom:40px}
+.card{background:#fff;border-radius:18px;padding:28px;box-shadow:0 8px 30px rgba(11,46,24,.07);margin-bottom:24px;transition:translate .3s var(--ease),box-shadow .3s;position:relative}
+.card:hover{translate:0 -3px;box-shadow:0 14px 36px rgba(11,46,24,.12)}
+.help-icon{display:inline;font-family:Georgia,serif;font-style:italic;font-size:8.5px;font-weight:600;color:var(--teal);opacity:.8;cursor:help;margin-left:2px;position:relative;vertical-align:super;line-height:1}
+.help-icon:hover{opacity:1}
+.help-icon:hover::after{content:attr(data-tooltip);position:absolute;bottom:140%;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 12px;border-radius:8px;font-family:'Outfit',Arial,sans-serif;font-style:normal;font-size:11px;font-weight:400;width:220px;text-align:left;z-index:100;line-height:1.4;pointer-events:none}
+.section-heading{display:flex;align-items:center;gap:15px;margin-bottom:24px}
+.sh-ic{display:grid;place-items:center;width:46px;height:46px;border-radius:14px;background:var(--mint);color:var(--teal);font-size:24px;flex:none}
+.section-heading h2{font-size:19px}
+.section-heading p{font-size:12px;color:var(--muted);margin-top:3px}
+.form-group{margin-bottom:18px}
+.form-group label{display:block;font-size:13px;font-weight:600;margin-bottom:8px}
+.form-group input{width:100%;padding:13px;border:1px solid var(--line);border-radius:10px;font-size:14px;outline:none;font-family:inherit;transition:all .25s}
+.form-group input:focus{border-color:var(--teal);box-shadow:0 0 0 4px rgba(22,163,74,.15);transform:translateY(-1px)}
+.form-group small{display:block;margin-top:6px;color:#87a68d;font-size:11px}
+.split-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.calculate-btn,.reset-btn{width:100%;padding:15px;border:none;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.calculate-btn{background:var(--teal);color:#fff;margin-top:8px;box-shadow:0 4px 15px rgba(22,163,74,.3)}
+.calculate-btn:hover{background:var(--teal-d);transform:translateY(-2px)}
+.calculate-btn:active{transform:scale(.98)}
+.reset-btn{background:var(--mint);color:var(--teal-d);margin-top:15px}
+.reset-btn:hover{background:#cfead6}
+.c-inflation{background:var(--mint);border:1px solid var(--teal);padding:20px;margin-bottom:20px}
+.c-risk{background:#fff6e0;border:1px solid var(--amber)}
+.c-rank{background:#eaf4fb;border:1px solid #3aa0d8}
 
-    .hero {
-      background: linear-gradient(135deg, #6558e8, #9c63e8, #5542a0);
-      background-size: 200% 200%;
-      animation: gradientShift 12s ease infinite;
-      color: white;
-      text-align: center;
-      padding: 60px 20px 90px;
-      position: relative;
-    }
+/* loader + maintenance */
+.calc-loader-overlay{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;z-index:999}
+.hidden{display:none}
+.calc-spinner{width:52px;height:52px;border:5px solid rgba(22,163,74,.18);border-top-color:var(--teal);border-radius:50%;margin-bottom:12px;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.calc-word{font-size:16px;font-weight:700;text-shadow:0 2px 10px #fff}
+.maintenance-window{position:fixed;inset:0;background:linear-gradient(135deg,#06220f,#14532d);color:#fff;display:flex;align-items:center;justify-content:center;padding:24px;z-index:9999;text-align:center}
+.maintenance-window.hidden,.calc-loader-overlay.hidden{display:none}
+.maintenance-box{max-width:440px;width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(10px);border-radius:22px;padding:36px 26px}
+.maintenance-icon{font-size:52px;color:var(--amber);margin-bottom:14px}
+.maintenance-box h2{font-size:24px;margin-bottom:10px}
+.maintenance-box p{font-size:14px;line-height:1.7;color:#d5ecda}
 
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
+/* results */
+.results{margin-top:28px}
+.animate-slide-up{animation:up .6s var(--ease) forwards;opacity:0;transform:translateY(20px)}
+@keyframes up{to{opacity:1;transform:none}}
+.main-result{background:linear-gradient(135deg,var(--ink),#15803d);color:#fff;padding:35px 25px;border-radius:18px;text-align:center;margin-bottom:24px}
+.danger-pulse{animation:up .6s var(--ease) forwards,glow 1.5s infinite alternate}
+@keyframes glow{0%{box-shadow:0 0 15px rgba(255,90,78,.3)}100%{box-shadow:0 0 32px rgba(255,90,78,.75)}}
+.result-label{font-size:11px;letter-spacing:2px;opacity:.8;font-weight:600}
+.main-result h2{font-size:clamp(25px,5vw,36px);margin:15px 0}
+#result-message{font-size:13px;line-height:1.7;opacity:.9}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:20px 0}
+.stat-card{text-align:center;padding:25px 15px;margin:0}
+.stat-card .sh-ic{margin:0 auto}
+.stat-card p{font-size:12px;color:var(--muted);margin:10px 0}
+.stat-card h3{font-size:23px;color:var(--teal)}
+.risk-progress-container{width:100%;background:#ffe9b8;border-radius:8px;height:10px;margin-top:12px;overflow:hidden}
+.risk-progress-bar{height:100%;width:0;background:linear-gradient(90deg,#2ed573,var(--amber),var(--coral));border-radius:8px;transition:width 1s var(--ease)}
+.budget-highlight{background:var(--mint);border-radius:12px;padding:20px;text-align:center;margin:20px 0}
+.budget-highlight p{font-size:12px;color:var(--muted)}
+.budget-highlight h3{font-size:32px;color:var(--teal);margin-top:8px}
+.advice{font-size:12px;color:#3f6a48;line-height:1.6;margin-bottom:12px}
+.prediction-list{background:#f6fbf7;border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:15px}
+.prediction-list h3{font-size:15px;color:var(--teal-d);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.prediction-list ul{list-style:none;font-size:12px;color:#3f6a48;line-height:2}
+.prediction-list li::before{content:"";display:inline-block;width:7px;height:7px;border-radius:2px;background:var(--amber);margin-right:9px}
+.survival-card h2{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.survival-card h2 .ic{color:var(--amber);font-size:26px}
 
-    .api-status-banner {
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(6px);
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
+/* extra sections */
+.wide{width:90%;max-width:1040px;margin:0 auto;padding:70px 0 10px}
+.sec-title{font-size:clamp(26px,4.5vw,38px);text-align:center;font-weight:800;line-height:1.15}
+.sec-sub{text-align:center;color:var(--muted);max-width:560px;margin:10px auto 40px;font-size:15px;line-height:1.6}
+.steps{position:relative;max-width:640px;margin:0 auto;padding-left:70px;display:grid;gap:34px}
+.steps::before,.steps::after{content:"";position:absolute;left:25px;top:10px;bottom:10px;width:3px;border-radius:3px;background:var(--line)}
+.steps::after{background:linear-gradient(var(--teal),var(--amber));transform-origin:top;transform:scaleY(var(--p,0))}
+.step{position:relative}
+.step .num{position:absolute;left:-70px;top:0;width:52px;height:52px;border-radius:50%;background:#fff;border:3px solid var(--teal);color:var(--teal);display:grid;place-items:center;font-size:24px;transition:all .5s}
+.step.in .num{background:var(--teal);color:#fff;transform:scale(1.08)}
+.step h3{font-size:19px;margin-bottom:4px}
+.step p{color:var(--muted);font-size:14px;line-height:1.6}
+.leaks{background:linear-gradient(135deg,var(--ink),#14532d);color:#fff;border-radius:26px;padding:44px 34px;max-width:760px;margin:0 auto}
+.leaks .sec-title{font-size:clamp(24px,4vw,32px)}
+.leaks .sec-sub{color:#b5d9bd;margin-bottom:30px}
+.leak{display:grid;grid-template-columns:150px 1fr 48px;gap:14px;align-items:center;margin-bottom:16px;font-size:14px}
+.leak b{display:flex;align-items:center;gap:8px;font-weight:500}
+.leak b .ic{color:var(--amber);font-size:18px}
+.bar{height:12px;background:rgba(255,255,255,.12);border-radius:8px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:8px;background:linear-gradient(90deg,var(--amber),var(--coral));transition:width 1.4s var(--ease) var(--d,0s)}
+.in .bar i{width:var(--w)}
+.leak em{font-style:normal;font-weight:700;text-align:right}
+.note{font-size:11px;color:#8fba98;text-align:center;margin-top:20px}
+.tips{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.tip{margin:0;padding:26px}
+.tip .sh-ic{margin-bottom:14px;background:#fff3d6;color:#c77700}
+.tip h3{font-size:17px;margin-bottom:6px}
+.tip p{font-size:13.5px;color:var(--muted);line-height:1.6}
+.faq{max-width:700px;margin:0 auto}
+.faq details{background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:12px;padding:0 20px;transition:box-shadow .3s}
+.faq details[open]{box-shadow:0 10px 26px rgba(11,46,24,.09);border-color:var(--teal)}
+.faq summary{list-style:none;cursor:pointer;padding:18px 0;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary .ic{color:var(--teal);font-size:20px;transition:transform .3s}
+.faq details[open] summary .ic{transform:rotate(180deg)}
+.faq p{padding:0 0 18px;color:var(--muted);font-size:14px;line-height:1.7}
+footer{text-align:center;padding:70px 10px 40px;color:var(--muted);font-size:13px;line-height:2}
+footer .ic{font-size:34px;color:var(--teal);display:block;margin:0 auto 8px}
+.footer-small{font-size:11px;color:#9ab7a0}
 
-    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #ff4757; position: relative; }
-    .status-dot.online { background: #2ed573; box-shadow: 0 0 10px #2ed573; animation: pulseDot 2s infinite; }
 
-    @keyframes pulseDot {
-      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 213, 115, 0.7); }
-      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(46, 213, 115, 0); }
-      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 213, 115, 0); }
-    }
+html{scroll-padding-top:70px}
+.nav{position:fixed;top:0;left:0;right:0;z-index:900;display:flex;align-items:center;justify-content:space-between;padding:12px 4vw;background:rgba(255,255,255,.12);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.2);color:#fff;transition:background .3s,color .3s,box-shadow .3s}
+.nav.scrolled{background:rgba(255,255,255,.9);color:var(--ink);box-shadow:0 4px 20px rgba(11,46,24,.1)}
+.brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:19px;color:inherit;text-decoration:none}
+.brand .ic{font-size:24px}
+.nav-links{display:flex;gap:26px}
+.nav-links a{color:inherit;text-decoration:none;font-size:14px;font-weight:500;opacity:.9;transition:opacity .2s}
+.nav-links a:hover{opacity:1;text-decoration:underline;text-underline-offset:6px}
+.user{position:relative}
+.user-btn{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:30px;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.15);color:inherit;font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.nav.scrolled .user-btn{border-color:var(--line);background:var(--mint)}
+.avatar{width:28px;height:28px;border-radius:50%;background:var(--amber);color:#3a2500;display:grid;place-items:center;font-weight:800;font-size:13px}
+.menu{position:absolute;right:0;top:130%;width:250px;background:#fff;color:var(--ink);border-radius:14px;box-shadow:0 18px 44px rgba(11,46,24,.22);padding:16px;opacity:0;visibility:hidden;transform:translateY(-8px);transition:all .25s var(--ease)}
+.menu.open{opacity:1;visibility:visible;transform:none}
+.menu .who{display:flex;gap:10px;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.menu .who .avatar{width:40px;height:40px;font-size:18px}
+.menu b{display:block;font-size:14px;word-break:break-all}
+.menu small{color:var(--muted);font-size:12px}
+.menu button{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;border:none;border-radius:10px;background:var(--mint);color:var(--teal-d);font:inherit;font-weight:700;font-size:13px;cursor:pointer}
+.menu button:hover{background:#cfead6}
+.auth{position:fixed;inset:0;z-index:5000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(8,40,20,.38);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.auth.hidden{display:none}
+.auth-card{width:100%;max-width:400px;padding:34px 28px;border-radius:24px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.38);box-shadow:0 24px 60px rgba(0,0,0,.28);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);color:#fff;animation:up .7s var(--ease) both}
+.auth-card .logo{width:64px;height:64px;font-size:34px;border-radius:18px;margin-bottom:10px;animation:none}
+.auth-card h2{font-size:26px;text-align:center}
+.auth-card>p{text-align:center;font-size:13px;opacity:.85;margin:4px 0 18px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;background:rgba(255,255,255,.14);border-radius:12px;padding:4px;margin-bottom:16px}
+.tabs button{padding:9px;border:none;border-radius:9px;background:transparent;color:#fff;font:inherit;font-weight:600;font-size:13px;cursor:pointer;transition:all .25s}
+.tabs button.on{background:rgba(255,255,255,.92);color:var(--teal-d)}
+.field{position:relative;margin-bottom:12px}
+.field .ic{position:absolute;left:13px;top:50%;margin-top:-9px;font-size:18px;opacity:.8}
+.field input{width:100%;padding:13px 13px 13px 42px;border-radius:12px;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.12);color:#fff;font:inherit;font-size:14px;outline:none;transition:all .2s}
+.field input::placeholder{color:rgba(255,255,255,.65)}
+.field input:focus{background:rgba(255,255,255,.22);border-color:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.15)}
+.auth-err{min-height:18px;font-size:12px;color:#ffd0cb;margin-bottom:8px}
+.auth-btn{width:100%;padding:14px;border:none;border-radius:12px;font:inherit;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .2s}
+.auth-btn:hover{transform:translateY(-2px)}
+.auth-btn.main{background:var(--amber);color:#3a2500}
+.auth-btn.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.5);margin-top:10px}
+.or{text-align:center;font-size:12px;opacity:.75;margin:14px 0 0}
+.auth-note{font-size:11px;opacity:.7;text-align:center;margin-top:14px;line-height:1.5}
+@media(max-width:720px){.nav-links{display:none}}
 
-    .logo {
-      font-size: 50px;
-      margin-bottom: 10px;
-      display: inline-block;
-      animation: floatLogo 3s ease-in-out infinite;
-    }
-
-    @keyframes floatLogo {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
-    }
-
-    .tagline { font-size: 12px; font-weight: 600; letter-spacing: 3px; opacity: 0.85; }
-    .hero h1 { font-size: clamp(28px, 5vw, 45px); margin: 15px 0; font-weight: 800; }
-    .subtitle { max-width: 600px; margin: auto; font-size: 14px; line-height: 1.8; opacity: 0.9; }
-
-    .container {
-      width: 90%;
-      max-width: 750px;
-      margin: -45px auto 0;
-      position: relative;
-      padding-bottom: 60px;
-    }
-
-    .card {
-      background: white;
-      border-radius: 18px;
-      padding: 28px;
-      box-shadow: 0 8px 30px rgba(45, 39, 100, 0.07);
-      margin-bottom: 24px;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      position: relative;
-    }
-
-    .card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 35px rgba(45, 39, 100, 0.1);
-    }
-
-    .help-icon {
-      display: inline;
-      font-family: Georgia, "Times New Roman", serif;
-      font-style: italic;
-      font-size: 8.5px;
-      font-weight: 600;
-      color: #7c6ee6;
-      opacity: 0.75;
-      cursor: help;
-      margin-left: 2px;
-      position: relative;
-      vertical-align: super;
-      line-height: 1;
-    }
-
-    .help-icon:hover {
-      opacity: 1;
-      color: #5544d1;
-    }
-
-    .help-icon:hover::after {
-      content: attr(data-tooltip);
-      position: absolute;
-      bottom: 140%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #292449;
-      color: white;
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-family: 'Poppins', Arial, sans-serif;
-      font-style: normal;
-      font-size: 11px;
-      font-weight: 400;
-      width: 220px;
-      text-align: left;
-      z-index: 100;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-      line-height: 1.4;
-      pointer-events: none;
-    }
-
-    .section-heading {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      margin-bottom: 24px;
-    }
-
-    .section-heading span { font-size: 32px; }
-    .section-heading h2 { font-size: 19px; }
-    .section-heading p { font-size: 12px; color: #85849a; margin-top: 3px; }
-
-    .form-group { margin-bottom: 18px; }
-    .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
-
-    .form-group input {
-      width: 100%; padding: 13px; border: 1px solid #deddea; border-radius: 10px;
-      font-size: 14px; outline: none; font-family: inherit; transition: all 0.25s ease;
-    }
-    .form-group input:focus {
-      border-color: #7665e8;
-      box-shadow: 0 0 0 4px rgba(118, 101, 232, 0.15);
-      transform: translateY(-1px);
-    }
-    .form-group small { display: block; margin-top: 6px; color: #9291a3; font-size: 11px; }
-
-    .split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-
-    .calculate-btn, .reset-btn {
-      width: 100%; padding: 15px; border: none; border-radius: 10px;
-      font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer; transition: all 0.2s ease;
-    }
-    .calculate-btn { background: #6c5ce7; color: white; margin-top: 8px; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3); }
-    .calculate-btn:hover { background: #5544d1; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(108, 92, 231, 0.4); }
-    .calculate-btn:active { transform: scale(0.98); }
-
-    .calc-loader-overlay {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      pointer-events: none;
-      z-index: 999;
-    }
-
-    .calc-loader-overlay.hidden {
-      display: none;
-    }
-
-    .calc-spinner {
-      width: 52px;
-      height: 52px;
-      border: 5px solid rgba(108, 92, 231, 0.18);
-      border-top-color: #6c5ce7;
-      border-radius: 50%;
-      margin-bottom: 12px;
-      animation: spinLoader 0.55s linear infinite, rainbowCircle 0.001s steps(1, end) infinite;
-    }
-
-    @keyframes spinLoader {
-      to { transform: rotate(360deg); }
-    }
-
-    @keyframes rainbowCircle {
-      0%    { border-top-color: #ff4757; filter: drop-shadow(0 0 8px rgba(255, 71, 87, 0.65)); }
-      14.2% { border-top-color: #ff7f50; filter: drop-shadow(0 0 8px rgba(255, 127, 80, 0.65)); }
-      28.4% { border-top-color: #ffa502; filter: drop-shadow(0 0 8px rgba(255, 165, 2, 0.65)); }
-      42.6% { border-top-color: #2ed573; filter: drop-shadow(0 0 8px rgba(46, 213, 115, 0.65)); }
-      56.8% { border-top-color: #1e90ff; filter: drop-shadow(0 0 8px rgba(30, 144, 255, 0.65)); }
-      71.0% { border-top-color: #6c5ce7; filter: drop-shadow(0 0 8px rgba(108, 92, 231, 0.65)); }
-      85.2% { border-top-color: #ff6b81; filter: drop-shadow(0 0 8px rgba(255, 107, 129, 0.65)); }
-      100%  { border-top-color: #ff4757; filter: drop-shadow(0 0 8px rgba(255, 71, 87, 0.65)); }
-    }
-
-    .calc-word {
-      font-size: 16px;
-      font-weight: 700;
-      color: #25243a;
-      text-shadow: 0 2px 10px rgba(255, 255, 255, 0.9);
-    }
-
-    .maintenance-window {
-      position: fixed;
-      inset: 0;
-      width: 100vw;
-      height: 100vh;
-      background: linear-gradient(135deg, #1b1833, #2c2654);
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      z-index: 9999;
-      text-align: center;
-    }
-
-    .maintenance-window.hidden {
-      display: none;
-    }
-
-    .maintenance-box {
-      max-width: 440px;
-      width: 100%;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      backdrop-filter: blur(10px);
-      border-radius: 22px;
-      padding: 36px 26px;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
-    }
-
-    .maintenance-icon {
-      font-size: 48px;
-      margin-bottom: 14px;
-    }
-
-    .maintenance-box h2 {
-      font-size: 24px;
-      font-weight: 800;
-      margin-bottom: 10px;
-    }
-
-    .maintenance-box p {
-      font-size: 14px;
-      line-height: 1.7;
-      color: #e2e0f5;
-    }
-
-    .results { margin-top: 28px; }
-    .hidden { display: none; }
-
-    .animate-slide-up {
-      animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      opacity: 0;
-      transform: translateY(20px);
-    }
-
-    @keyframes slideUpFade {
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .main-result {
-      background: linear-gradient(135deg, #292449, #5542a0);
-      color: white; padding: 35px 25px; border-radius: 18px; text-align: center;
-      box-shadow: 0 8px 25px rgba(45, 39, 100, 0.12);
-    }
-
-    .danger-pulse {
-      animation: dangerGlow 1.5s infinite alternate;
-    }
-    @keyframes dangerGlow {
-      0% { box-shadow: 0 0 15px rgba(255, 71, 87, 0.3); border: 1px solid rgba(255, 71, 87, 0.4); }
-      100% { box-shadow: 0 0 30px rgba(255, 71, 87, 0.7); border: 1px solid rgba(255, 71, 87, 0.9); }
-    }
-
-    .result-label { font-size: 11px; letter-spacing: 2px; opacity: 0.8; font-weight: 600; }
-    .main-result h2 { font-size: clamp(25px, 5vw, 35px); margin: 15px 0; }
-    #result-message { font-size: 13px; line-height: 1.7; opacity: 0.9; }
-
-    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 20px 0; }
-    .stat-card { text-align: center; padding: 25px 15px; }
-    .stat-card span { font-size: 28px; }
-    .stat-card p { font-size: 12px; color: #85849a; margin: 10px 0; }
-    .stat-card h3 { font-size: 23px; color: #6656df; }
-
-    .risk-progress-container {
-      width: 100%; background: #e2def8; border-radius: 8px; height: 10px; margin-top: 12px; overflow: hidden;
-    }
-    .risk-progress-bar {
-      height: 100%; width: 0%;
-      background: linear-gradient(90deg, #2ed573, #ffa502, #ff4757);
-      border-radius: 8px; transition: width 1s cubic-bezier(0.1, 1, 0.1, 1);
-    }
-
-    .budget-highlight {
-      background: #f1efff; border-radius: 12px; padding: 20px; text-align: center; margin: 20px 0;
-    }
-    .budget-highlight p { font-size: 12px; color: #7770a5; }
-    .budget-highlight h3 { font-size: 32px; color: #6558e8; margin-top: 8px; }
-
-    .advice {
-      font-size: 12px;
-      color: #55536f;
-      line-height: 1.6;
-      margin-bottom: 12px;
-    }
-
-    .reset-btn { background: #e9e6ff; color: #6558e8; margin-top: 15px; }
-    .reset-btn:hover { background: #dcd7ff; }
-
-    .prediction-list {
-      background: #faf9ff; border: 1px solid #e2def8; border-radius: 14px; padding: 18px; margin-top: 15px;
-    }
-    .prediction-list h3 { font-size: 15px; color: #5542a0; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-    .prediction-list ul { list-style: none; font-size: 12px; color: #55536f; line-height: 2; }
-    .prediction-list ul li::before { content: "🔹 "; color: #6c5ce7; }
-
-    footer { text-align: center; padding: 35px 10px; color: #77768b; font-size: 12px; line-height: 2; }
-    .footer-small { font-size: 11px; color: #aaa8b9; }
-  </style>
+.split{display:grid;grid-template-columns:1fr 1fr;gap:38px;align-items:center}
+.split .sec-title,.split .sec-sub{text-align:left;margin-left:0}
+.split .sec-sub{margin-bottom:16px}
+@media(max-width:820px){.split{grid-template-columns:1fr}}
+.cliff{background:#fff;border-radius:22px;padding:18px;box-shadow:0 12px 36px rgba(11,46,24,.09)}
+.cliff svg{width:100%;height:auto;display:block}
+.cliff text{font-family:'Outfit',Arial,sans-serif;font-size:11px;fill:var(--muted)}
+.draw{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 2.4s var(--ease) .3s}
+.in .draw{stroke-dashoffset:0}
+.zone{opacity:0;transition:opacity .8s 2.2s}
+.in .zone{opacity:1}
+.pin{opacity:0;transition:opacity .5s 2.5s}
+.in .pin{opacity:1}
+.pin circle.pulse{animation:ping 1.6s ease-out infinite;transform-origin:300px 200px}
+@keyframes ping{0%{transform:scale(1);opacity:.7}100%{transform:scale(3.2);opacity:0}}
+.bullets{list-style:none;display:grid;gap:10px;font-size:14px;color:#3f6a48}
+.bullets li{display:flex;gap:10px;align-items:flex-start;line-height:1.5}
+.bullets .ic{color:var(--teal);font-size:20px;margin-top:1px}
+.est{max-width:620px;margin:0 auto;padding:30px}
+.est label{display:flex;justify-content:space-between;font-size:14px;font-weight:600;margin:14px 0 8px}
+.est input[type=range]{width:100%;accent-color:var(--teal)}
+.est-bar{height:16px;border-radius:10px;background:#e3efe6;overflow:hidden;margin:22px 0 10px}
+.est-bar i{display:block;height:100%;width:0;border-radius:10px;background:var(--teal);transition:width .5s var(--ease),background .3s}
+#qtxt{font-size:15px;font-weight:600;min-height:46px}
+.est small{color:var(--muted);font-size:11.5px}
+.tip.feat .sh-ic{background:var(--mint);color:var(--teal)}
+.ready{max-width:760px;margin:0 auto;background:linear-gradient(135deg,var(--ink),#14532d);color:#fff;border-radius:22px;padding:30px}
+.ready h2{font-size:22px;margin-bottom:4px}
+.ready>p{font-size:13px;color:#b5d9bd;margin-bottom:16px}
+.ready ul{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:10px 18px;font-size:14px}
+.ready li{display:flex;gap:10px;align-items:center}
+.ready li .ic{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--amber);color:#3a2500;padding:5px}
+@media(max-width:560px){.ready ul{grid-template-columns:1fr}}
+/* scroll reveal */
+.reveal{opacity:0;transform:translateY(36px);transition:opacity .8s var(--ease),transform .8s var(--ease);transition-delay:var(--d,0s)}
+.reveal[data-a=left]{transform:translateX(-44px)}
+.reveal[data-a=right]{transform:translateX(44px)}
+.reveal[data-a=zoom]{transform:scale(.9)}
+.reveal.in{opacity:1;transform:none}
+@media(max-width:560px){.split-grid,.stats-grid{grid-template-columns:1fr}.leak{grid-template-columns:1fr 44px}.leak .bar{grid-column:1/-1;grid-row:2}.hero{padding-top:110px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal,.animate-slide-up{opacity:1;transform:none}.bar i{width:var(--w)}}
+</style>
 </head>
 <body>
+<div id="progress"></div>
 
-  <div id="maintenance-window" class="maintenance-window hidden" role="dialog" aria-modal="true" aria-live="assertive">
-    <div class="maintenance-box">
-      <div class="maintenance-icon">🛠️</div>
-      <h2>Site Ongoing Maintenance</h2>
-      <p>BrokeMeter is temporarily under maintenance. We will be back online shortly.</p>
+<nav class="nav" id="nav">
+  <a class="brand" href="#top"><svg class="ic"><use href="#i-coin"/></svg>BrokeMeter</a>
+  <div class="nav-links">
+    <a href="#calculator">Calculator</a><a href="#how">How it works</a><a href="#tips">Tips</a><a href="#faq">FAQ</a>
+  </div>
+  <div class="user">
+    <button class="user-btn" id="userBtn" type="button" aria-haspopup="true" aria-expanded="false">
+      <span class="avatar" id="userAvatar">G</span><span id="userName">Guest</span><svg class="ic"><use href="#i-chev"/></svg>
+    </button>
+    <div class="menu" id="userMenu">
+      <div class="who"><span class="avatar" id="menuAvatar">G</span><div><b id="menuEmail">Guest</b><small id="menuType">Guest account</small></div></div>
+      <button type="button" id="logoutBtn"><svg class="ic"><use href="#i-logout"/></svg><span id="logoutText">Log out</span></button>
     </div>
   </div>
+</nav>
 
-  <header class="hero">
-    <div id="api-status-banner" class="api-status-banner">
-      <div id="status-dot" class="status-dot"></div>
-      <span id="status-text">Checking API...</span>
-    </div>
+<div class="auth hidden" id="auth" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+  <div class="auth-card">
+    <div style="text-align:center"><div class="logo"><svg class="ic"><use href="#i-coin"/></svg></div></div>
+    <h2 id="authTitle">Welcome back</h2>
+    <p id="authSub">Sign in to continue to BrokeMeter.</p>
+    <div class="tabs"><button type="button" id="tabIn" class="on">Sign in</button><button type="button" id="tabUp">Create account</button></div>
+    <form id="authForm" novalidate>
+      <div class="field"><svg class="ic"><use href="#i-mail"/></svg><input type="email" id="authEmail" placeholder="Email address" autocomplete="email"></div>
+      <div class="field"><svg class="ic"><use href="#i-lock"/></svg><input type="password" id="authPass" placeholder="Password" autocomplete="current-password"></div>
+      <div class="field hidden" id="confirmWrap"><svg class="ic"><use href="#i-lock"/></svg><input type="password" id="authConfirm" placeholder="Confirm password" autocomplete="new-password"></div>
+      <p class="auth-err" id="authErr" role="alert"></p>
+      <button class="auth-btn main" type="submit" id="authSubmit">Sign in</button>
+    </form>
+    <p class="or">or</p>
+    <button class="auth-btn ghost" type="button" id="guestBtn"><svg class="ic"><use href="#i-user"/></svg>Continue as guest</button>
+    <p class="auth-note">Accounts are saved in the BrokeMeter database. If the server is unreachable, your account is saved on this device instead.</p>
+  </div>
+</div>
 
-    <div class="logo">💸</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="i-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 8h6M9 11h6M10 8c4 0 4 5 0 5l4 4"/></symbol>
+<symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
+<symbol id="i-calc" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/></symbol>
+<symbol id="i-wallet" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="3"/><path d="M16 13h5v4h-5a2 2 0 0 1 0-4zM5 6l11-3v3"/></symbol>
+<symbol id="i-hourglass" viewBox="0 0 24 24"><path d="M6 2h12M6 22h12M7 2v4a5 5 0 0 0 2 4l3 2-3 2a5 5 0 0 0-2 4v4M17 2v4a5 5 0 0 1-2 4l-3 2 3 2a5 5 0 0 1 2 4v4"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2 20h20zM12 10v4M12 17h.01"/></symbol>
+<symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3"/></symbol>
+<symbol id="i-bowl" viewBox="0 0 24 24"><path d="M3 11h18a9 9 0 0 1-18 0zM8 7c0-2 2-2 2-4M13 7c0-2 2-2 2-4M7 21h10"/></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V4M4 20h16M8 16v-4M12 16V8M16 16v-6"/></symbol>
+<symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></symbol>
+<symbol id="i-rocket" viewBox="0 0 24 24"><path d="M5 15c-1 1-2 4-2 6 2 0 5-1 6-2M14 4c3-1 6-1 7-1 0 1 0 4-1 7l-7 7-6-6zM15 9h.01"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14-4L4 9M4 4v5h5M4 13a8 8 0 0 0 14 4l2-2M20 20v-5h-5"/></symbol>
+<symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4l10-10-4-4L4 16zM13 7l4 4"/></symbol>
+<symbol id="i-cpu" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></symbol>
+<symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol>
+<symbol id="i-coffee" viewBox="0 0 24 24"><path d="M4 8h12v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zM16 10h2a2 2 0 0 1 0 4h-2M7 2v3M11 2v3"/></symbol>
+<symbol id="i-bus" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="14" rx="3"/><path d="M4 11h16M7 20v-3M17 20v-3M8 14h.01M16 14h.01"/></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></symbol>
+<symbol id="i-tv" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M8 3l4 3 4-3"/></symbol>
+<symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h6v17H6a2 2 0 0 0-2 2zM20 5a2 2 0 0 0-2-2h-6v17h6a2 2 0 0 1 2 2z"/></symbol>
+<symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6zM9 12l2 2 4-4"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></symbol>
+<symbol id="i-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+<symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-4 3-6 7-6s7 2 7 6M17 5a3.5 3.5 0 0 1 0 7M22 20c0-3-2-5-4-5.5"/></symbol>
+</svg>
+
+<div id="maintenance-window" class="maintenance-window hidden" role="dialog" aria-modal="true" aria-live="assertive">
+  <div class="maintenance-box">
+    <div class="maintenance-icon"><svg class="ic"><use href="#i-wrench"/></svg></div>
+    <h2>Site Ongoing Maintenance</h2>
+    <p>BrokeMeter is temporarily under maintenance. We will be back online shortly.</p>
+  </div>
+</div>
+
+<header class="hero" id="top">
+  <div class="coin" data-speed=".35" style="top:16%;left:8%;--s:54px;--t:5s"><span>₹</span></div>
+  <div class="coin" data-speed=".6" style="top:58%;left:14%;--s:34px;--t:4s"><span>₹</span></div>
+  <div class="coin" data-speed=".45" style="top:22%;right:10%;--s:44px;--t:6s"><span>₹</span></div>
+  <div class="coin" data-speed=".8" style="top:62%;right:7%;--s:62px;--t:5.5s"><span>₹</span></div>
+  <div class="coin" data-speed=".25" style="top:44%;left:44%;--s:26px;--t:4.5s"><span>₹</span></div>
+
+  <div id="api-status-banner" class="api-status-banner">
+    <div id="status-dot" class="status-dot"></div>
+    <span id="status-text">Checking API...</span>
+  </div>
+
+  <div class="hero-inner" id="heroInner">
+    <div class="logo"><svg class="ic"><use href="#i-coin"/></svg></div>
     <p class="tagline">BROKEMETER - ADVANCED ANALYTICS & FORECASTING</p>
     <h1>Where Did My Money Go?</h1>
-    <p class="subtitle"></p>
-  </header>
+    <p class="subtitle">Enter your allowance and spending habits. BrokeMeter forecasts the day your balance hits zero, then hands you a plan to survive until the next credit.</p>
+    <div class="chips">
+      <span><svg class="ic"><use href="#i-cal"/></svg>Weekday and weekend model</span>
+      <span><svg class="ic"><use href="#i-alert"/></svg>Risk score</span>
+      <span><svg class="ic"><use href="#i-users"/></svg>Peer rank</span>
+    </div>
+    <a class="cta" href="#calculator"><svg class="ic"><use href="#i-calc"/></svg>Start my forecast</a>
+  </div>
+  <svg class="ic scroll-cue"><use href="#i-chev"/></svg>
+  <svg class="wave" viewBox="0 0 1440 80" preserveAspectRatio="none"><path d="M0 40C240 90 480 0 720 30s480 60 720 10V80H0z" fill="#f1f8f2" stroke="none"/></svg>
+</header>
 
-  <main class="container">
+<section class="wide" id="cliff">
+  <div class="split">
+    <div>
+      <h2 class="sec-title reveal">The mid-month cliff</h2>
+      <p class="sec-sub reveal" style="--d:.1s">Allowance lands on the 1st, the canteen gets a regular, and by the middle of the month the balance is gone. BrokeMeter shows you that cliff before you fall off it.</p>
+      <ul class="bullets">
+        <li class="reveal" data-a="left" style="--d:.15s"><svg class="ic"><use href="#i-check"/></svg>Small daily spends add up faster than one big purchase.</li>
+        <li class="reveal" data-a="left" style="--d:.25s"><svg class="ic"><use href="#i-check"/></svg>Weekends usually cost two to three times a weekday.</li>
+        <li class="reveal" data-a="left" style="--d:.35s"><svg class="ic"><use href="#i-check"/></svg>Fixed bills quietly shrink what you can actually spend.</li>
+      </ul>
+    </div>
+    <div class="cliff reveal" data-a="right">
+      <svg viewBox="0 0 420 250" role="img" aria-label="Illustration of a balance falling to zero before the next allowance">
+        <g stroke="#d2e6d6" stroke-width="1"><line x1="40" y1="40" x2="400" y2="40"/><line x1="40" y1="120" x2="400" y2="120"/><line x1="40" y1="200" x2="400" y2="200"/></g>
+        <rect class="zone" x="300" y="40" width="100" height="160" fill="#ff5a4e" opacity=".12"/>
+        <path class="draw" pathLength="1" d="M40 40 L90 72 L118 78 L170 112 L198 118 L250 152 L278 158 L300 200" fill="none" stroke="#16a34a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        <line class="zone" x1="300" y1="200" x2="400" y2="200" stroke="#ff5a4e" stroke-width="4" stroke-dasharray="6 6"/>
+        <g class="pin"><circle class="pulse" cx="300" cy="200" r="6" fill="#ff5a4e"/><circle cx="300" cy="200" r="6" fill="#ff5a4e"/></g>
+        <text x="44" y="30">Day 1: allowance lands</text>
+        <text x="206" y="188">Balance hits zero</text>
+        <text class="zone" x="306" y="62" style="fill:#d92f24">Noodle zone</text>
+        <text x="40" y="224">Day 1</text><text x="190" y="224">Day 15</text><text x="352" y="224">Day 30</text>
+        <text x="40" y="242" style="font-size:10px">Illustration only</text>
+      </svg>
+    </div>
+  </div>
+</section>
 
-    <section class="card animate-slide-up" style="background: #f0edff; border: 1px solid #7665e8; margin-bottom: 20px; padding: 20px;">
-      <div class="section-heading" style="margin-bottom: 6px;">
-        <span>⚡</span>
-        <div>
-          <h2 style="font-size: 16px; color: #5542a0;">Live Campus Inflation Index <span class="help-icon" data-tooltip="Shows how much everyday campus prices have gone up so your budget stays realistic.">i</span></h2>
-          <p id="campus-inflation-status">Fetching API index...</p>
+<section class="wide" id="estimate" style="padding-top:60px">
+  <h2 class="sec-title reveal">Quick reality check</h2>
+  <p class="sec-sub reveal" style="--d:.1s">Move the sliders for a rough idea of how long your money lasts, then run the full forecast below.</p>
+  <div class="card est reveal" data-a="zoom">
+    <label for="qa">Monthly allowance <b id="qav">₹8,000</b></label>
+    <input type="range" id="qa" min="2000" max="30000" step="500" value="8000">
+    <label for="qd">Average daily spend <b id="qdv">₹300</b></label>
+    <input type="range" id="qd" min="50" max="1000" step="10" value="300">
+    <div class="est-bar"><i id="qbar"></i></div>
+    <p id="qtxt" aria-live="polite"></p>
+    <small>Rough estimate that ignores bills. The full forecast below gives your real number.</small>
+  </div>
+</section>
+
+<section class="wide" style="padding-top:60px">
+  <h2 class="sec-title reveal">What you get</h2>
+  <p class="sec-sub reveal" style="--d:.1s">One short form turns into a full picture of your month.</p>
+  <div class="tips">
+    <div class="card tip feat reveal"><span class="sh-ic"><svg class="ic"><use href="#i-cal"/></svg></span><h3>Your zero date</h3><p>The exact day your balance is forecast to hit zero if nothing changes.</p></div>
+    <div class="card tip feat reveal" style="--d:.1s"><span class="sh-ic"><svg class="ic"><use href="#i-alert"/></svg></span><h3>Risk score</h3><p>How likely you are to overspend before the next allowance arrives.</p></div>
+    <div class="card tip feat reveal" style="--d:.2s"><span class="sh-ic"><svg class="ic"><use href="#i-users"/></svg></span><h3>Peer rank</h3><p>See how your allowance and spending compare with other students.</p></div>
+    <div class="card tip feat reveal" style="--d:.3s"><span class="sh-ic"><svg class="ic"><use href="#i-wallet"/></svg></span><h3>Safe daily budget</h3><p>A daily spending limit that gets you to the next credit.</p></div>
+  </div>
+</section>
+
+<section class="wide" style="padding-top:60px">
+  <h2 class="sec-title reveal">Which spender are you?</h2>
+  <p class="sec-sub reveal" style="--d:.1s">Most students fall into one of these. Spot yours, then check the numbers.</p>
+  <div class="tips">
+    <div class="card tip reveal" data-a="left"><span class="sh-ic"><svg class="ic"><use href="#i-coffee"/></svg></span><h3>The canteen regular</h3><p>Chai, samosa, repeat. Every visit is cheap, but the daily total is not. A daily cap fixes most of it.</p></div>
+    <div class="card tip reveal" style="--d:.1s"><span class="sh-ic"><svg class="ic"><use href="#i-users"/></svg></span><h3>The weekend warrior</h3><p>Quiet weekdays, expensive Saturdays. Set a fixed outing budget before you leave the hostel.</p></div>
+    <div class="card tip reveal" data-a="right" style="--d:.2s"><span class="sh-ic"><svg class="ic"><use href="#i-tv"/></svg></span><h3>The subscription collector</h3><p>Five plans, one watched. Cancel what you didn't open last month and share the rest.</p></div>
+  </div>
+</section>
+
+<section class="wide" style="padding-top:60px;padding-bottom:0">
+  <div class="ready reveal" data-a="zoom">
+    <h2>Have these ready</h2>
+    <p>It takes about two minutes. Rough numbers are fine.</p>
+    <ul>
+      <li><svg class="ic"><use href="#i-check"/></svg>Monthly allowance</li>
+      <li><svg class="ic"><use href="#i-check"/></svg>Fixed monthly bills</li>
+      <li><svg class="ic"><use href="#i-check"/></svg>Average weekday spend</li>
+      <li><svg class="ic"><use href="#i-check"/></svg>Average weekend spend</li>
+      <li><svg class="ic"><use href="#i-check"/></svg>Date your allowance arrived</li>
+    </ul>
+  </div>
+</section>
+
+<main class="container" id="calculator">
+
+  <section class="card c-inflation animate-slide-up">
+    <div class="section-heading" style="margin-bottom:6px">
+      <span class="sh-ic"><svg class="ic"><use href="#i-bolt"/></svg></span>
+      <div>
+        <h2 style="font-size:16px;color:var(--teal-d)">Live Campus Inflation Index <span class="help-icon" data-tooltip="Shows how much everyday campus prices have gone up so your budget stays realistic.">i</span></h2>
+        <p id="campus-inflation-status">Fetching API index...</p>
+      </div>
+    </div>
+    <p id="campus-inflation-advice" style="font-size:12px;color:var(--teal);font-weight:500"></p>
+  </section>
+
+  <section class="calculator card animate-slide-up" style="animation-delay:.1s">
+    <div class="section-heading">
+      <span class="sh-ic"><svg class="ic"><use href="#i-calc"/></svg></span>
+      <div><h2>Calculate Financial Forecast <span class="help-icon" data-tooltip="Enter your monthly money and daily spending to see how long your balance will last.">i</span></h2></div>
+    </div>
+    <form id="budget-form">
+      <div class="form-group">
+        <label for="allowance">Monthly Allowance (₹)</label>
+        <input type="number" id="allowance" placeholder="e.g. 10000" min="0" step="0.01" required>
+      </div>
+      <div class="form-group">
+        <label for="bills">Monthly Recurring Bills (₹)</label>
+        <input type="number" id="bills" placeholder="e.g. 3000" min="0" step="0.01" value="0" required>
+        <small>Hostel fees, subscriptions, recharge, mess charges.</small>
+      </div>
+      <div class="split-grid">
+        <div class="form-group">
+          <label for="weekday-spending">Weekday Daily Spend (₹)</label>
+          <input type="number" id="weekday-spending" placeholder="e.g. 200" min="0" step="0.01" required>
+          <small>Mon - Fri (Mess, canteen)</small>
+        </div>
+        <div class="form-group">
+          <label for="weekend-spending">Weekend Daily Spend (₹)</label>
+          <input type="number" id="weekend-spending" placeholder="e.g. 500" min="0" step="0.01" required>
+          <small>Sat - Sun (Outings, cafes)</small>
         </div>
       </div>
-      <p id="campus-inflation-advice" style="font-size: 12px; color: #6558e8; font-weight: 500;"></p>
-    </section>
-
-    <section class="calculator card animate-slide-up" style="animation-delay: 0.1s;">
-      <div class="section-heading">
-        <span>🧮</span>
-        <div>
-          <h2>Calculate Financial Forecast <span class="help-icon" data-tooltip="Enter your monthly money and daily spending to see how long your balance will last.">i</span></h2>
-        </div>
+      <div class="form-group">
+        <label for="start-date">Allowance Received On</label>
+        <input type="date" id="start-date" required>
       </div>
+      <button type="submit" class="calculate-btn"><svg class="ic"><use href="#i-rocket"/></svg>Predict My Financial Doom</button>
+    </form>
+  </section>
 
-      <form id="budget-form">
-        <div class="form-group">
-          <label for="allowance">Monthly Allowance (₹)</label>
-          <input type="number" id="allowance" placeholder="e.g. 10000" min="0" step="0.01" required>
-        </div>
+  <div id="calc-modal" class="calc-loader-overlay hidden" role="status" aria-live="polite">
+    <div class="calc-spinner"></div>
+    <p class="calc-word">Loading...</p>
+  </div>
 
-        <div class="form-group">
-          <label for="bills">Monthly Recurring Bills (₹)</label>
-          <input type="number" id="bills" placeholder="e.g. 3000" min="0" step="0.01" value="0" required>
-          <small>Hostel fees, subscriptions, recharge, mess charges.</small>
-        </div>
-
-        <div class="split-grid">
-          <div class="form-group">
-            <label for="weekday-spending">Weekday Daily Spend (₹)</label>
-            <input type="number" id="weekday-spending" placeholder="e.g. 200" min="0" step="0.01" required>
-            <small>Mon - Fri (Mess, canteen)</small>
-          </div>
-
-          <div class="form-group">
-            <label for="weekend-spending">Weekend Daily Spend (₹)</label>
-            <input type="number" id="weekend-spending" placeholder="e.g. 500" min="0" step="0.01" required>
-            <small>Sat - Sun (Outings, cafes)</small>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="start-date">Allowance Received On</label>
-          <input type="date" id="start-date" required>
-        </div>
-
-        <button type="submit" class="calculate-btn">Predict My Financial Doom 🚀</button>
-      </form>
-    </section>
-
-    <div id="calc-modal" class="calc-loader-overlay hidden" role="status" aria-live="polite">
-      <div class="calc-spinner"></div>
-      <p class="calc-word">Loading...</p>
+  <section id="results" class="results hidden" aria-live="polite">
+    <div id="main-result-card" class="result-card main-result animate-slide-up">
+      <p class="result-label">YOUR MONEY WILL RUN OUT ON <span class="help-icon" data-tooltip="The date your leftover money is expected to reach zero if you keep spending at your current pace.">i</span></p>
+      <h2 id="zero-date">--</h2>
+      <p id="result-message"></p>
     </div>
 
-    <section id="results" class="results hidden" aria-live="polite">
-
-      <div id="main-result-card" class="result-card main-result animate-slide-up">
-        <p class="result-label">YOUR MONEY WILL RUN OUT ON <span class="help-icon" data-tooltip="The date your leftover money is expected to reach zero if you keep spending at your current pace.">i</span></p>
-        <h2 id="zero-date">--</h2>
-        <p id="result-message"></p>
+    <div class="stats-grid">
+      <div class="stat-card card animate-slide-up" style="animation-delay:.15s">
+        <span class="sh-ic"><svg class="ic"><use href="#i-wallet"/></svg></span>
+        <p>Spendable Balance <span class="help-icon" data-tooltip="Money left in hand after subtracting your fixed monthly bills.">i</span></p>
+        <h3 id="remaining-money">₹0</h3>
       </div>
-
-      <div class="stats-grid">
-        <div class="stat-card card animate-slide-up" style="animation-delay: 0.15s;">
-          <span>💰</span>
-          <p>Spendable Balance <span class="help-icon" data-tooltip="Money left in hand after subtracting your fixed monthly bills.">i</span></p>
-          <h3 id="remaining-money">₹0</h3>
-        </div>
-
-        <div class="stat-card card animate-slide-up" style="animation-delay: 0.2s;">
-          <span>⏳</span>
-          <p>ML Forecasted Days <span class="help-icon" data-tooltip="Estimated number of days your leftover money can last.">i</span></p>
-          <h3 id="days-left">--</h3>
-        </div>
+      <div class="stat-card card animate-slide-up" style="animation-delay:.2s">
+        <span class="sh-ic"><svg class="ic"><use href="#i-hourglass"/></svg></span>
+        <p>ML Forecasted Days <span class="help-icon" data-tooltip="Estimated number of days your leftover money can last.">i</span></p>
+        <h3 id="days-left">--</h3>
       </div>
+    </div>
 
-      <div class="card animate-slide-up" style="background: #fff9f0; border: 1px solid #f39c12; animation-delay: 0.25s;">
-        <div class="section-heading" style="margin-bottom: 10px;">
-          <span>⚠️</span>
-          <div>
-            <h2 style="font-size: 16px; color: #d35400;">AI Risk Probability Score <span class="help-icon" data-tooltip="Chance of running out of money early based on how fast you spend compared to what you have.">i</span></h2>
-            <p>Calculated using regression & burn velocity metrics</p>
-          </div>
-        </div>
-        <h3 id="risk-score-display" style="font-size: 20px; color: #e67e22;">Analyzing...</h3>
-        <p id="risk-percentage-text" style="font-size: 12px; color: #7f8c8d; margin-top: 5px;"></p>
-
-        <div class="risk-progress-container">
-          <div id="risk-bar" class="risk-progress-bar"></div>
+    <div class="card c-risk animate-slide-up" style="animation-delay:.25s">
+      <div class="section-heading" style="margin-bottom:10px">
+        <span class="sh-ic" style="background:#ffe9b8;color:#c77700"><svg class="ic"><use href="#i-alert"/></svg></span>
+        <div>
+          <h2 style="font-size:16px;color:#a35f00">AI Risk Probability Score <span class="help-icon" data-tooltip="Chance of running out of money early based on how fast you spend compared to what you have.">i</span></h2>
+          <p>Calculated using regression & burn velocity metrics</p>
         </div>
       </div>
+      <h3 id="risk-score-display" style="font-size:20px;color:#c77700">Analyzing...</h3>
+      <p id="risk-percentage-text" style="font-size:12px;color:var(--muted);margin-top:5px"></p>
+      <div class="risk-progress-container"><div id="risk-bar" class="risk-progress-bar"></div></div>
+    </div>
 
-      <div class="card animate-slide-up" style="background: #eef9f2; border: 1px solid #2ed573; animation-delay: 0.3s;">
-        <div class="section-heading" style="margin-bottom: 10px;">
-          <span>🏆</span>
-          <div>
-            <h2 style="font-size: 16px; color: #1e8449;">Hostel Financial Rank <span class="help-icon" data-tooltip="How your allowance compares with other students in the saved data.">i</span></h2>
-            <p>Benchmarked against student spending dataset</p>
-          </div>
-        </div>
-        <h3 id="peer-rank-display" style="font-size: 22px; color: #27ae60;">Calculating...</h3>
-      </div>
-
-      <div class="survival-card card animate-slide-up" style="animation-delay: 0.35s;">
-        <h2>🍜 Instant Noodle Survival Plan</h2>
-        <p id="survival-message"></p>
-
-        <div class="budget-highlight">
-          <p>Recommended Safe Daily Budget <span class="help-icon" data-tooltip="The amount you can spend each day so your money lasts until your next allowance.">i</span></p>
-          <h3 id="recommended-budget">₹0</h3>
-        </div>
-
-        <p id="budget-advice" class="advice"></p>
-
-        <div class="prediction-list">
-          <h3>📊 Regression Prediction Breakdown <span class="help-icon" data-tooltip="Simple summary of your monthly spending pace and whether you end up saving or falling short.">i</span></h3>
-          <ul>
-            <li>Estimated monthly total burn velocity: <strong id="pred-monthly-burn">--</strong></li>
-            <li>Recommended maximum weekend outing limit: <strong id="pred-weekend-cap">--</strong></li>
-            <li>Projected month-end cash surplus / deficit: <strong id="pred-surplus-deficit">--</strong></li>
-          </ul>
+    <div class="card c-rank animate-slide-up" style="animation-delay:.3s">
+      <div class="section-heading" style="margin-bottom:10px">
+        <span class="sh-ic" style="background:#d6ebf7;color:#1c6a96"><svg class="ic"><use href="#i-trophy"/></svg></span>
+        <div>
+          <h2 style="font-size:16px;color:#1c6a96">Hostel Financial Rank <span class="help-icon" data-tooltip="How your allowance compares with other students in the saved data.">i</span></h2>
+          <p>Benchmarked against student spending dataset</p>
         </div>
       </div>
+      <h3 id="peer-rank-display" style="font-size:22px;color:#1c6a96">Calculating...</h3>
+    </div>
 
-      <button type="button" id="reset-btn" class="reset-btn">Calculate Again ↻</button>
-    </section>
+    <div class="survival-card card animate-slide-up" style="animation-delay:.35s">
+      <h2><svg class="ic"><use href="#i-bowl"/></svg>Instant Noodle Survival Plan</h2>
+      <p id="survival-message"></p>
+      <div class="budget-highlight">
+        <p>Recommended Safe Daily Budget <span class="help-icon" data-tooltip="The amount you can spend each day so your money lasts until your next allowance.">i</span></p>
+        <h3 id="recommended-budget">₹0</h3>
+      </div>
+      <p id="budget-advice" class="advice"></p>
+      <div class="prediction-list">
+        <h3><svg class="ic"><use href="#i-chart"/></svg>Regression Prediction Breakdown <span class="help-icon" data-tooltip="Simple summary of your monthly spending pace and whether you end up saving or falling short.">i</span></h3>
+        <ul>
+          <li>Estimated monthly total burn velocity: <strong id="pred-monthly-burn">--</strong></li>
+          <li>Recommended maximum weekend outing limit: <strong id="pred-weekend-cap">--</strong></li>
+          <li>Projected month-end cash surplus / deficit: <strong id="pred-surplus-deficit">--</strong></li>
+        </ul>
+      </div>
+    </div>
 
-    <footer>
-      <p>Made for students whose money has a shorter lifespan than a packet of Maggi. 🍜</p>
-      <p class="footer-small">Spend wisely. Survive the semester.</p>
-    </footer>
+    <button type="button" id="reset-btn" class="reset-btn"><svg class="ic"><use href="#i-refresh"/></svg>Calculate Again</button>
+  </section>
+</main>
 
-  </main>
+<section class="wide" id="how">
+  <h2 class="sec-title reveal">How BrokeMeter works</h2>
+  <p class="sec-sub reveal" style="--d:.1s">Three inputs, one forecast, zero surprises at the canteen counter.</p>
+  <div class="steps" id="steps">
+    <div class="step reveal" data-a="left"><div class="num"><svg class="ic"><use href="#i-edit"/></svg></div><h3>Tell us your numbers</h3><p>Add your allowance, fixed bills and what you spend on weekdays versus weekends.</p></div>
+    <div class="step reveal" data-a="left"><div class="num"><svg class="ic"><use href="#i-cpu"/></svg></div><h3>The model does the maths</h3><p>Your weekday and weekend spending is blended into one daily burn rate and sent to the prediction model.</p></div>
+    <div class="step reveal" data-a="left"><div class="num"><svg class="ic"><use href="#i-target"/></svg></div><h3>Get your zero date and a plan</h3><p>See the day your money runs out, a risk score, your peer rank and a safe daily budget.</p></div>
+  </div>
+</section>
 
-  <script>
-    const DEFAULT_HOSTED_API_URL = "https://backendforbrokemeter.onrender.com";
+<section class="wide">
+  <div class="leaks reveal" data-a="zoom" id="leaks">
+    <h2 class="sec-title">Where student money leaks</h2>
+    <p class="sec-sub">A typical month, split by category. Food and outings take the biggest bite.</p>
+    <div class="leak"><b><svg class="ic"><use href="#i-coffee"/></svg>Food and canteen</b><div class="bar"><i style="--w:38%"></i></div><em data-count="38">0%</em></div>
+    <div class="leak"><b><svg class="ic"><use href="#i-users"/></svg>Outings and cafes</b><div class="bar"><i style="--w:24%;--d:.1s"></i></div><em data-count="24">0%</em></div>
+    <div class="leak"><b><svg class="ic"><use href="#i-phone"/></svg>Recharge and data</b><div class="bar"><i style="--w:12%;--d:.2s"></i></div><em data-count="12">0%</em></div>
+    <div class="leak"><b><svg class="ic"><use href="#i-tv"/></svg>Subscriptions</b><div class="bar"><i style="--w:9%;--d:.3s"></i></div><em data-count="9">0%</em></div>
+    <div class="leak"><b><svg class="ic"><use href="#i-bus"/></svg>Transport</b><div class="bar"><i style="--w:9%;--d:.4s"></i></div><em data-count="9">0%</em></div>
+    <div class="leak"><b><svg class="ic"><use href="#i-book"/></svg>Stationery</b><div class="bar"><i style="--w:8%;--d:.5s"></i></div><em data-count="8">0%</em></div>
+    <p class="note">Illustrative split for explanation only. Your own numbers will differ.</p>
+  </div>
+</section>
 
-    function resolveApiBaseUrl() {
-      const params = new URLSearchParams(window.location.search);
-      const queryUrl = params.get("api_url")?.trim() || "";
-      if (queryUrl) {
-        localStorage.setItem("BROKEMETER_API_URL", queryUrl.replace(/\/+$/, ""));
-      }
+<section class="wide" id="tips">
+  <h2 class="sec-title reveal">Survive the month: 6 habits</h2>
+  <p class="sec-sub reveal" style="--d:.1s">Small changes that move your zero date later.</p>
+  <div class="tips">
+    <div class="card tip reveal"><span class="sh-ic"><svg class="ic"><use href="#i-wallet"/></svg></span><h3>Pay bills on day one</h3><p>Move rent, recharge and subscriptions out first so the rest of your money is clearly spendable.</p></div>
+    <div class="card tip reveal" style="--d:.1s"><span class="sh-ic"><svg class="ic"><use href="#i-target"/></svg></span><h3>Set a daily cap</h3><p>Divide your spendable balance by the days left. That number is your safe daily budget.</p></div>
+    <div class="card tip reveal" style="--d:.2s"><span class="sh-ic"><svg class="ic"><use href="#i-coffee"/></svg></span><h3>Cap the weekend</h3><p>Weekends cost more than weekdays. Pick one outing a weekend and set its limit in advance.</p></div>
+    <div class="card tip reveal"><span class="sh-ic"><svg class="ic"><use href="#i-tv"/></svg></span><h3>Share subscriptions</h3><p>Split streaming and music plans with friends. Cancel anything you opened last month.</p></div>
+    <div class="card tip reveal" style="--d:.1s"><span class="sh-ic"><svg class="ic"><use href="#i-bus"/></svg></span><h3>Walk or share rides</h3><p>Short auto and cab trips add up quickly. Pool rides or take the bus where you can.</p></div>
+    <div class="card tip reveal" style="--d:.2s"><span class="sh-ic"><svg class="ic"><use href="#i-shield"/></svg></span><h3>Keep a buffer</h3><p>Park a small amount aside for emergencies so one surprise doesn't wreck the whole month.</p></div>
+  </div>
+</section>
 
-      const metaTag = document.querySelector('meta[name="api-base-url"]');
-      const metaUrl = metaTag ? metaTag.content.trim() : "";
-      const globalUrl = typeof window.__API_BASE_URL__ === "string" ? window.__API_BASE_URL__.trim() : "";
-      const savedUrl = localStorage.getItem("BROKEMETER_API_URL")?.trim() || "";
+<section class="wide" id="faq">
+  <h2 class="sec-title reveal">Questions you might have</h2>
+  <p class="sec-sub reveal" style="--d:.1s">Quick answers about how the forecast works.</p>
+  <div class="faq">
+    <details class="reveal"><summary>How is my daily spending calculated?<svg class="ic"><use href="#i-chev"/></svg></summary><p>We take five weekdays and two weekend days, add them up and divide by seven. That blended daily burn rate is used for the forecast.</p></details>
+    <details class="reveal" style="--d:.08s"><summary>How is the safe daily budget worked out?<svg class="ic"><use href="#i-chev"/></svg></summary><p>It is your spendable balance (allowance minus bills) divided by the number of days until your next allowance on the 1st.</p></details>
+    <details class="reveal" style="--d:.16s"><summary>What does the risk score mean?<svg class="ic"><use href="#i-chev"/></svg></summary><p>It estimates how likely you are to overspend before the next credit, based on how fast you spend compared to what you have left.</p></details>
+    <details class="reveal" style="--d:.24s"><summary>Where do my inputs go?<svg class="ic"><use href="#i-chev"/></svg></summary><p>Your numbers are sent to the BrokeMeter server to generate the prediction. The server may take a few seconds to wake up if it has been idle.</p></details>
+  </div>
+</section>
 
-      const chosen = queryUrl || globalUrl || metaUrl || DEFAULT_HOSTED_API_URL || savedUrl;
-      if (chosen) {
-        return chosen.replace(/\/+$/, "");
-      }
+<footer>
+  <svg class="ic"><use href="#i-bowl"/></svg>
+  <p>Made for students whose money has a shorter lifespan than a packet of Maggi.</p>
+  <p class="footer-small">Spend wisely. Survive the semester.</p>
+</footer>
 
-      const isLocal = ["localhost", "127.0.0.1"].includes(window.location.hostname);
-      return isLocal ? "http://127.0.0.1:8000" : window.location.origin;
+<script>
+const DEFAULT_HOSTED_API_URL = "https://backendforbrokemeter.onrender.com";
+function resolveApiBaseUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const queryUrl = params.get("api_url")?.trim() || "";
+  if (queryUrl) localStorage.setItem("BROKEMETER_API_URL", queryUrl.replace(/\/+$/, ""));
+  const metaTag = document.querySelector('meta[name="api-base-url"]');
+  const metaUrl = metaTag ? metaTag.content.trim() : "";
+  const globalUrl = typeof window.__API_BASE_URL__ === "string" ? window.__API_BASE_URL__.trim() : "";
+  const savedUrl = localStorage.getItem("BROKEMETER_API_URL")?.trim() || "";
+  const chosen = queryUrl || globalUrl || metaUrl || DEFAULT_HOSTED_API_URL || savedUrl;
+  if (chosen) return chosen.replace(/\/+$/, "");
+  const isLocal = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+  return isLocal ? "http://127.0.0.1:8000" : window.location.origin;
+}
+const API_BASE_URL = resolveApiBaseUrl();
+const statusDot = document.getElementById("status-dot");
+const statusText = document.getElementById("status-text");
+const maintenanceWindow = document.getElementById("maintenance-window");
+const calcModal = document.getElementById("calc-modal");
+let isSiteEnabled = true, exitSent = false;
+const openedAtMs = Date.now();
+
+const SESSION_ID = (() => {
+  let id = sessionStorage.getItem("BROKEMETER_SESSION_ID");
+  if (!id) {
+    id = (crypto.randomUUID ? crypto.randomUUID() : `sess_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`);
+    sessionStorage.setItem("BROKEMETER_SESSION_ID", id);
+  }
+  return id;
+})();
+
+function getClientMeta() {
+  return {
+    session_id: SESSION_ID, page_url: window.location.href,
+    platform: navigator.platform || "unknown", language: navigator.language || "unknown",
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "unknown",
+    screen: `${window.screen.width}x${window.screen.height}`,
+    viewport: `${window.innerWidth}x${window.innerHeight}`
+  };
+}
+
+function sendPresence(eventName, exitReason = null, useKeepalive = false) {
+  const payload = { event: eventName, ...getClientMeta(), duration_sec: Number(((Date.now() - openedAtMs) / 1000).toFixed(1)), exit_reason: exitReason };
+  const bodyStr = JSON.stringify(payload);
+  const url = `${API_BASE_URL}/api/presence`;
+  if (useKeepalive && navigator.sendBeacon) {
+    try {
+      const blob = new Blob([bodyStr], { type: "application/json" });
+      if (navigator.sendBeacon(url, blob)) return Promise.resolve();
+    } catch (_) {}
+  }
+  return fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: bodyStr, keepalive: useKeepalive }).catch(() => {});
+}
+function notifyExit(reason) { if (exitSent) return; exitSent = true; sendPresence("exit", reason, true); }
+window.addEventListener("pagehide", () => notifyExit("pagehide"));
+window.addEventListener("beforeunload", () => notifyExit("beforeunload"));
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") notifyExit("tab_hidden");
+  else if (document.visibilityState === "visible") { exitSent = false; sendPresence("open", null, false); }
+});
+
+function applyMaintenanceState(enabled) {
+  isSiteEnabled = Boolean(enabled);
+  if (!isSiteEnabled) {
+    calcModal.classList.add("hidden");
+    maintenanceWindow.classList.remove("hidden");
+    statusText.textContent = "Maintenance";
+  } else maintenanceWindow.classList.add("hidden");
+}
+
+async function fetchWithTimeout(url, options = {}, timeoutMs = 4000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try { return await fetch(url, { ...options, signal: controller.signal }); }
+  finally { clearTimeout(timer); }
+}
+
+async function syncSiteStatusAndHeartbeat() {
+  if (document.visibilityState !== "hidden") { exitSent = false; sendPresence("heartbeat", null, false); }
+  try {
+    const res = await fetchWithTimeout(`${API_BASE_URL}/api/site-status`, { cache: "no-store" }, 3000);
+    if (res.ok) {
+      const data = await res.json();
+      statusDot.classList.add("online");
+      applyMaintenanceState(data.enabled !== false);
+      if (data.enabled !== false) statusText.textContent = "API Online";
     }
+  } catch (_) {}
+}
 
-    const API_BASE_URL = resolveApiBaseUrl();
-    const statusDot = document.getElementById("status-dot");
-    const statusText = document.getElementById("status-text");
-    const maintenanceWindow = document.getElementById("maintenance-window");
-    const calcModal = document.getElementById("calc-modal");
+async function checkApiHealth() {
+  try {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/api/health`, { cache: "no-store" }, 5000);
+    if (response.ok) {
+      const data = await response.json();
+      statusDot.classList.add("online");
+      applyMaintenanceState(data.site_enabled !== false);
+      if (data.site_enabled !== false) statusText.textContent = "API Online";
+    } else throw new Error("Non-200 health response");
+  } catch (err) {
+    statusDot.classList.remove("online");
+    statusText.textContent = "API Offline / Waking Up";
+  }
+}
 
-    let isSiteEnabled = true;
-    let exitSent = false;
-    const openedAtMs = Date.now();
+sendPresence("open", null, false);
+checkApiHealth();
+syncSiteStatusAndHeartbeat();
+setInterval(syncSiteStatusAndHeartbeat, 1000);
+setInterval(checkApiHealth, 10000);
 
-    const SESSION_ID = (() => {
-      let id = sessionStorage.getItem("BROKEMETER_SESSION_ID");
-      if (!id) {
-        id = (crypto.randomUUID ? crypto.randomUUID() : `sess_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`);
-        sessionStorage.setItem("BROKEMETER_SESSION_ID", id);
-      }
-      return id;
-    })();
+async function loadCampusInflation() {
+  try {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/api/campus-inflation`, { cache: "no-store" }, 8000);
+    if (response.ok) {
+      const data = await response.json();
+      document.getElementById("campus-inflation-status").textContent = `Inflation Index: +${data.inflation_percentage}%`;
+      document.getElementById("campus-inflation-advice").textContent = "";
+    } else throw new Error("Failed inflation fetch");
+  } catch (e) {
+    document.getElementById("campus-inflation-status").textContent = "Standard Price Index (API Unreachable)";
+    document.getElementById("campus-inflation-advice").textContent = "";
+  }
+}
+loadCampusInflation();
 
-    function getClientMeta() {
-      return {
-        session_id: SESSION_ID,
-        page_url: window.location.href,
-        platform: navigator.platform || "unknown",
-        language: navigator.language || "unknown",
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "unknown",
-        screen: `${window.screen.width}x${window.screen.height}`,
-        viewport: `${window.innerWidth}x${window.innerHeight}`
-      };
-    }
+const form = document.getElementById("budget-form");
+const results = document.getElementById("results");
+const zeroDate = document.getElementById("zero-date");
+const resultMessage = document.getElementById("result-message");
+const remainingMoney = document.getElementById("remaining-money");
+const daysLeft = document.getElementById("days-left");
+const survivalMessage = document.getElementById("survival-message");
+const recommendedBudget = document.getElementById("recommended-budget");
+const budgetAdvice = document.getElementById("budget-advice");
+const resetButton = document.getElementById("reset-btn");
+const startDateInput = document.getElementById("start-date");
 
-    function sendPresence(eventName, exitReason = null, useKeepalive = false) {
-      const payload = {
-        event: eventName,
-        ...getClientMeta(),
-        duration_sec: Number(((Date.now() - openedAtMs) / 1000).toFixed(1)),
-        exit_reason: exitReason
-      };
+function formatMoney(amount) {
+  return new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 2 }).format(amount);
+}
+function showCalcPopup() { if (!isSiteEnabled) return; calcModal.classList.remove("hidden"); }
+function hideCalcPopup() { calcModal.classList.add("hidden"); }
 
-      const bodyStr = JSON.stringify(payload);
-      const url = `${API_BASE_URL}/api/presence`;
+function animateValue(element, start, end, duration, isCurrency = true) {
+  let startTimestamp = null;
+  const step = (timestamp) => {
+    if (!startTimestamp) startTimestamp = timestamp;
+    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+    const currentVal = progress * (end - start) + start;
+    element.textContent = isCurrency ? formatMoney(currentVal) : Math.floor(currentVal) + " Days";
+    if (progress < 1) window.requestAnimationFrame(step);
+  };
+  window.requestAnimationFrame(step);
+}
+function formatDate(date) { return date.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }); }
+function addDays(date, days) { const d = new Date(date); d.setDate(d.getDate() + days); return d; }
 
-      if (useKeepalive && navigator.sendBeacon) {
-        try {
-          const blob = new Blob([bodyStr], { type: "application/json" });
-          if (navigator.sendBeacon(url, blob)) {
-            return Promise.resolve();
-          }
-        } catch (_) {}
-      }
+const today = new Date();
+const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+function formatDateForInput(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+startDateInput.value = formatDateForInput(firstDay);
 
-      return fetch(url, {
+form.addEventListener("submit", async function(event) {
+  event.preventDefault();
+  await syncSiteStatusAndHeartbeat();
+  if (!isSiteEnabled) return;
+
+  const allowance = Number(document.getElementById("allowance").value);
+  const bills = Number(document.getElementById("bills").value);
+  const weekdaySpend = Number(document.getElementById("weekday-spending").value);
+  const weekendSpend = Number(document.getElementById("weekend-spending").value);
+  const startDate = new Date(startDateInput.value + "T00:00:00");
+
+  if (bills > allowance) { alert("Your recurring bills cannot be greater than your allowance."); return; }
+  showCalcPopup();
+
+  try {
+    const [response] = await Promise.all([
+      fetchWithTimeout(`${API_BASE_URL}/api/predict`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: bodyStr,
-        keepalive: useKeepalive
-      }).catch(() => {});
+        body: JSON.stringify({
+          allowance: allowance, bills: bills,
+          daily_spending: (weekdaySpend * 5 + weekendSpend * 2) / 7,
+          weekday_spending: weekdaySpend, weekend_spending: weekendSpend,
+          start_date: startDateInput.value, client_meta: getClientMeta()
+        })
+      }, 10000),
+      new Promise((resolve) => setTimeout(resolve, 1000))
+    ]);
+
+    const apiData = await response.json();
+    if (!response.ok) {
+      hideCalcPopup();
+      if (response.status === 503) { applyMaintenanceState(false); return; }
+      alert(apiData.detail || "Prediction error occurred.");
+      return;
     }
 
-    function notifyExit(reason) {
-      if (exitSent) return;
-      exitSent = true;
-      sendPresence("exit", reason, true);
+    const balance = apiData.balance;
+    const daysUntilZero = Math.ceil(apiData.predicted_days_left);
+    const nextAllowanceDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 1);
+    const daysInCycle = Math.max(1, Math.round((nextAllowanceDate - startDate) / (1000 * 60 * 60 * 24)));
+    const safeDailyBudget = daysInCycle > 0 ? balance / daysInCycle : 0;
+
+    hideCalcPopup();
+    animateValue(remainingMoney, 0, balance, 800, true);
+    animateValue(recommendedBudget, 0, safeDailyBudget, 800, true);
+    if (daysUntilZero <= daysInCycle) animateValue(daysLeft, 0, daysUntilZero, 800, false);
+    else daysLeft.textContent = "Safe Cycle";
+
+    document.getElementById("peer-rank-display").textContent = apiData.peer_rank;
+    document.getElementById("risk-score-display").textContent = apiData.risk_score;
+    document.getElementById("risk-percentage-text").textContent = `Model Overspend Risk Probability: ${apiData.risk_percentage}%`;
+    setTimeout(() => { document.getElementById("risk-bar").style.width = apiData.risk_percentage + "%"; }, 200);
+
+    const mainCard = document.getElementById("main-result-card");
+    if (daysUntilZero <= 5 || balance <= 0) mainCard.classList.add("danger-pulse");
+    else mainCard.classList.remove("danger-pulse");
+
+    const weightedDaily = (weekdaySpend * 5 + weekendSpend * 2) / 7;
+    const estimatedMonthlyBurn = weightedDaily * 30;
+    document.getElementById("pred-monthly-burn").textContent = formatMoney(estimatedMonthlyBurn);
+    document.getElementById("pred-weekend-cap").textContent = formatMoney(safeDailyBudget * 1.3) + " / day";
+    const surplusDeficitVal = balance - estimatedMonthlyBurn;
+    const surplusElem = document.getElementById("pred-surplus-deficit");
+    surplusElem.textContent = formatMoney(surplusDeficitVal);
+    surplusElem.style.color = surplusDeficitVal >= 0 ? "#12a150" : "#e5392d";
+
+    if (balance <= 0) {
+      zeroDate.textContent = formatDate(startDate);
+      resultMessage.textContent = "Your bills consumed your entire allowance. Financial disaster on day one!";
+      survivalMessage.textContent = "Zero spendable balance left—stick strictly to mess/basic essentials.";
+      budgetAdvice.textContent = "Consider lowering fixed monthly commitments or tracking small recurring charges.";
+    } else if (daysUntilZero <= daysInCycle) {
+      zeroDate.textContent = formatDate(addDays(startDate, Math.max(0, daysUntilZero - 1)));
+      resultMessage.textContent = `At your split burn rate (${formatMoney(apiData.effective_daily_spending)}/day), funds hit zero in ${daysUntilZero} days.`;
+      survivalMessage.textContent = "Your daily burn rate will run out before the month ends. Trim weekend outings and impulse snacks.";
+      budgetAdvice.textContent = `Keep average daily spend at or below ${formatMoney(safeDailyBudget)} to make it to ${formatDate(nextAllowanceDate)}.`;
+    } else {
+      zeroDate.textContent = "You survived!";
+      resultMessage.textContent = `Congratulations! Forecast predicts survival until your next credit on ${formatDate(nextAllowanceDate)}.`;
+      survivalMessage.textContent = "Your spending habits are well balanced for this cycle!";
+      budgetAdvice.textContent = `You have room to stay around ${formatMoney(safeDailyBudget)}/day while keeping a buffer.`;
     }
 
-    window.addEventListener("pagehide", () => notifyExit("pagehide"));
-    window.addEventListener("beforeunload", () => notifyExit("beforeunload"));
-    document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "hidden") {
-        notifyExit("tab_hidden");
-      } else if (document.visibilityState === "visible") {
-        exitSent = false;
-        sendPresence("open", null, false);
-      }
+    results.classList.remove("hidden");
+    results.scrollIntoView({ behavior: "smooth", block: "start" });
+  } catch (err) {
+    hideCalcPopup();
+    console.error("API error:", err);
+    alert(`Failed to connect to FastAPI backend at ${API_BASE_URL}. Please try again in a few seconds if Render is waking up.`);
+  }
+});
+
+resetButton.addEventListener("click", function() {
+  form.reset();
+  startDateInput.value = formatDateForInput(firstDay);
+  document.getElementById("risk-bar").style.width = "0%";
+  results.classList.add("hidden");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+/* ---------- scroll effects ---------- */
+(function () {
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const counters = new WeakSet();
+
+  function countUp(el) {
+    if (counters.has(el)) return; counters.add(el);
+    const end = +el.dataset.count, t0 = performance.now();
+    (function tick(t) {
+      const p = Math.min((t - t0) / 1400, 1);
+      el.textContent = Math.round(end * (1 - Math.pow(1 - p, 3))) + "%";
+      if (p < 1) requestAnimationFrame(tick);
+    })(t0);
+  }
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add("in");
+      e.target.querySelectorAll("[data-count]").forEach(countUp);
+      io.unobserve(e.target);
     });
+  }, { threshold: 0.18, rootMargin: "0px 0px -6% 0px" });
 
-    function applyMaintenanceState(enabled) {
-      isSiteEnabled = Boolean(enabled);
-      if (!isSiteEnabled) {
-        calcModal.classList.add("hidden");
-        maintenanceWindow.classList.remove("hidden");
-        statusText.textContent = "Maintenance";
-      } else {
-        maintenanceWindow.classList.add("hidden");
+  document.querySelectorAll(".reveal").forEach((el) => {
+    if (reduce) { el.classList.add("in"); el.querySelectorAll("[data-count]").forEach((c) => { c.textContent = c.dataset.count + "%"; }); }
+    else io.observe(el);
+  });
+
+  const bar = document.getElementById("progress");
+  const coins = [...document.querySelectorAll(".coin")];
+  const heroInner = document.getElementById("heroInner");
+  const steps = document.getElementById("steps");
+  let ticking = false;
+
+  function update() {
+    const y = window.scrollY;
+    document.getElementById("nav").classList.toggle("scrolled", y > 40);
+    const max = document.documentElement.scrollHeight - innerHeight;
+    bar.style.transform = `scaleX(${max > 0 ? y / max : 0})`;
+    if (!reduce) {
+      coins.forEach((c) => { c.style.transform = `translate3d(0,${y * c.dataset.speed}px,0)`; });
+      if (y < innerHeight) {
+        heroInner.style.transform = `translateY(${y * 0.22}px)`;
+        heroInner.style.opacity = Math.max(0, 1 - y / (innerHeight * 0.75));
       }
     }
+    const r = steps.getBoundingClientRect();
+    const p = Math.min(1, Math.max(0, (innerHeight * 0.65 - r.top) / r.height));
+    steps.style.setProperty("--p", p);
+    ticking = false;
+  }
+  window.addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+  window.addEventListener("resize", update);
+  update();
+})();
 
-    async function fetchWithTimeout(url, options = {}, timeoutMs = 4000) {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), timeoutMs);
+/* ---------- login + user menu (MySQL-backed API) ---------- */
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const SESS = "BROKEMETER_USER";
+  let mode = "in", busy = false;
+  localStorage.removeItem("BROKEMETER_USERS");   // old browser-only accounts
+  const readSess = () => { try { return JSON.parse(localStorage.getItem(SESS)); } catch (_) { return null; } };
+
+  async function api(path, body, token) {
+    const res = await fetchWithTimeout(`${API_BASE_URL}${path}`, {
+      method: body ? "POST" : "GET",
+      headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      body: body ? JSON.stringify(body) : undefined
+    }, 20000);
+    let data = {};
+    try { data = await res.json(); } catch (_) {}
+    if (!res.ok) {
+      const msg = typeof data.detail === "string" ? data.detail : "Please check your details and try again.";
+      throw Object.assign(new Error(msg), { status: res.status });
+    }
+    return data;
+  }
+
+  /* Fallback: if the login server is unreachable, accounts are kept on this device */
+  const LOCAL = "BROKEMETER_LOCAL_USERS";
+  const localUsers = () => { try { return JSON.parse(localStorage.getItem(LOCAL)) || {}; } catch (_) { return {}; } };
+  const isDown = (ex) => !ex.status || ex.status === 404 || ex.status === 405 || ex.status >= 500;
+  async function hashPw(pw, salt) {
+    const txt = salt + pw;
+    if (window.crypto && crypto.subtle) {
+      const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(txt));
+      return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join("");
+    }
+    return btoa(unescape(encodeURIComponent(txt)));
+  }
+  const fail = (status, msg) => Object.assign(new Error(msg), { status });
+  async function localRegister(email, pw) {
+    const u = localUsers();
+    if (u[email]) throw fail(409, "An account with this email already exists. Sign in instead.");
+    const salt = [...crypto.getRandomValues(new Uint8Array(12))].map((x) => x.toString(16).padStart(2, "0")).join("");
+    u[email] = { salt, hash: await hashPw(pw, salt) };
+    localStorage.setItem(LOCAL, JSON.stringify(u));
+  }
+  async function localLogin(email, pw) {
+    const u = localUsers()[email];
+    if (!u) throw fail(503, "The login server is unreachable and no account for this email is saved on this device. Try again in a few seconds, or continue as guest.");
+    if (u.hash !== await hashPw(pw, u.salt)) throw fail(401, "Incorrect email or password.");
+  }
+
+  function submitLabel() { return mode === "up" ? "Create account" : "Sign in"; }
+  function setBusy(on) {
+    busy = on;
+    $("authSubmit").disabled = on;
+    $("authSubmit").textContent = on ? (mode === "up" ? "Creating account..." : "Signing in...") : submitLabel();
+  }
+  function setMode(m) {
+    mode = m; const up = m === "up";
+    $("tabIn").classList.toggle("on", !up); $("tabUp").classList.toggle("on", up);
+    $("confirmWrap").classList.toggle("hidden", !up);
+    $("authTitle").textContent = up ? "Create your account" : "Welcome back";
+    $("authSub").textContent = up ? "It takes a few seconds." : "Sign in to continue to BrokeMeter.";
+    $("authSubmit").textContent = submitLabel();
+    $("authPass").autocomplete = up ? "new-password" : "current-password";
+    $("authErr").textContent = "";
+  }
+  function render() {
+    const s = readSess(), box = $("auth");
+    if (!s) { box.classList.remove("hidden"); document.body.style.overflow = "hidden"; return; }
+    box.classList.add("hidden"); document.body.style.overflow = "";
+    const guest = s.type === "guest", name = guest ? "Guest" : s.email.split("@")[0];
+    const ini = name.charAt(0).toUpperCase();
+    $("userName").textContent = name.length > 14 ? name.slice(0, 13) + "…" : name;
+    $("userAvatar").textContent = ini; $("menuAvatar").textContent = ini;
+    $("menuEmail").textContent = guest ? "Guest" : s.email;
+    $("menuType").textContent = guest ? "Guest account" : s.local ? "Member account (saved on this device)" : "Member account";
+    $("logoutText").textContent = guest ? "Sign in or create account" : "Log out";
+  }
+  function start(sess) { localStorage.setItem(SESS, JSON.stringify(sess)); render(); window.scrollTo(0, 0); }
+
+  $("tabIn").onclick = () => setMode("in");
+  $("tabUp").onclick = () => setMode("up");
+  $("guestBtn").onclick = () => start({ type: "guest" });
+
+  $("authForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (busy) return;
+    const email = $("authEmail").value.trim().toLowerCase(), pw = $("authPass").value, err = $("authErr");
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { err.textContent = "Enter a valid email address."; return; }
+    if (pw.length < 8) { err.textContent = "Password must be at least 8 characters."; return; }
+    if (pw.length > 72) { err.textContent = "Password must be 72 characters or fewer."; return; }
+    if (mode === "up" && pw !== $("authConfirm").value) { err.textContent = "Passwords do not match."; return; }
+    err.textContent = "";
+    setBusy(true);
+    try {
+      let data = null;
       try {
-        return await fetch(url, { ...options, signal: controller.signal });
-      } finally {
-        clearTimeout(timer);
+        data = await api(mode === "up" ? "/api/register" : "/api/login", { email, password: pw });
+      } catch (ex) {
+        if (mode === "in" && ex.status === 401) { await localLogin(email, pw).catch(() => { throw ex; }); }
+        else if (isDown(ex)) { await (mode === "up" ? localRegister : localLogin)(email, pw); }
+        else throw ex;
       }
-    }
+      $("authForm").reset();
+      start(data ? { type: "member", email: data.user.email, token: data.token } : { type: "member", email, local: true });
+    } catch (ex) {
+      err.textContent = ex.status ? ex.message : "Something went wrong. Please try again.";
+    } finally { setBusy(false); }
+  });
 
-    async function syncSiteStatusAndHeartbeat() {
-      if (document.visibilityState !== "hidden") {
-        exitSent = false;
-        sendPresence("heartbeat", null, false);
-      }
-      try {
-        const res = await fetchWithTimeout(`${API_BASE_URL}/api/site-status`, { cache: "no-store" }, 3000);
-        if (res.ok) {
-          const data = await res.json();
-          statusDot.classList.add("online");
-          applyMaintenanceState(data.enabled !== false);
-          if (data.enabled !== false) {
-            statusText.textContent = "API Online";
-          }
-        }
-      } catch (_) {}
-    }
+  const menu = $("userMenu"), btn = $("userBtn");
+  const closeMenu = () => { menu.classList.remove("open"); btn.setAttribute("aria-expanded", "false"); };
+  btn.onclick = (e) => { e.stopPropagation(); const o = menu.classList.toggle("open"); btn.setAttribute("aria-expanded", o); };
+  document.addEventListener("click", (e) => { if (!menu.contains(e.target)) closeMenu(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeMenu(); });
+  $("logoutBtn").onclick = () => { closeMenu(); localStorage.removeItem(SESS); setMode("in"); window.scrollTo(0, 0); render(); };
 
-    async function checkApiHealth() {
-      try {
-        const response = await fetchWithTimeout(`${API_BASE_URL}/api/health`, { cache: "no-store" }, 5000);
-        if (response.ok) {
-          const data = await response.json();
-          statusDot.classList.add("online");
-          applyMaintenanceState(data.site_enabled !== false);
-          if (data.site_enabled !== false) {
-            statusText.textContent = "API Online";
-          }
-        } else {
-          throw new Error("Non-200 health response");
-        }
-      } catch (err) {
-        statusDot.classList.remove("online");
-        statusText.textContent = "API Offline / Waking Up";
-      }
-    }
+  render();
+  const s0 = readSess();   // drop expired sessions, but keep them if the server is just asleep
+  if (s0 && s0.type === "member" && s0.token) {
+    api("/api/me", null, s0.token).catch((ex) => { if (ex.status === 401) { localStorage.removeItem(SESS); render(); } });
+  }
+})();
 
-    sendPresence("open", null, false);
-    checkApiHealth();
-    syncSiteStatusAndHeartbeat();
-    setInterval(syncSiteStatusAndHeartbeat, 1000);
-    setInterval(checkApiHealth, 10000);
-
-    async function loadCampusInflation() {
-      try {
-        const response = await fetchWithTimeout(`${API_BASE_URL}/api/campus-inflation`, { cache: "no-store" }, 8000);
-        if (response.ok) {
-          const data = await response.json();
-          document.getElementById("campus-inflation-status").textContent = `Inflation Index: +${data.inflation_percentage}%`;
-          document.getElementById("campus-inflation-advice").textContent = "";
-        } else {
-          throw new Error("Failed inflation fetch");
-        }
-      } catch (e) {
-        document.getElementById("campus-inflation-status").textContent = "Standard Price Index (API Unreachable)";
-        document.getElementById("campus-inflation-advice").textContent = "";
-      }
-    }
-    loadCampusInflation();
-
-    const form = document.getElementById("budget-form");
-    const results = document.getElementById("results");
-    const zeroDate = document.getElementById("zero-date");
-    const resultMessage = document.getElementById("result-message");
-    const remainingMoney = document.getElementById("remaining-money");
-    const daysLeft = document.getElementById("days-left");
-    const survivalMessage = document.getElementById("survival-message");
-    const recommendedBudget = document.getElementById("recommended-budget");
-    const budgetAdvice = document.getElementById("budget-advice");
-    const resetButton = document.getElementById("reset-btn");
-    const startDateInput = document.getElementById("start-date");
-
-    function formatMoney(amount) {
-      return new Intl.NumberFormat("en-IN", {
-        style: "currency",
-        currency: "INR",
-        maximumFractionDigits: 2
-      }).format(amount);
-    }
-
-    function showCalcPopup() {
-      if (!isSiteEnabled) return;
-      calcModal.classList.remove("hidden");
-    }
-
-    function hideCalcPopup() {
-      calcModal.classList.add("hidden");
-    }
-
-    function animateValue(element, start, end, duration, isCurrency = true) {
-      let startTimestamp = null;
-      const step = (timestamp) => {
-        if (!startTimestamp) startTimestamp = timestamp;
-        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-        const currentVal = progress * (end - start) + start;
-        element.textContent = isCurrency ? formatMoney(currentVal) : Math.floor(currentVal) + " Days";
-        if (progress < 1) {
-          window.requestAnimationFrame(step);
-        }
-      };
-      window.requestAnimationFrame(step);
-    }
-
-    function formatDate(date) {
-      return date.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
-    }
-
-    function addDays(date, days) {
-      const newDate = new Date(date);
-      newDate.setDate(newDate.getDate() + days);
-      return newDate;
-    }
-
-    const today = new Date();
-    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-    function formatDateForInput(date) {
-      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-    }
-    startDateInput.value = formatDateForInput(firstDay);
-
-    form.addEventListener("submit", async function(event) {
-      event.preventDefault();
-
-      await syncSiteStatusAndHeartbeat();
-      if (!isSiteEnabled) {
-        return;
-      }
-
-      const allowance = Number(document.getElementById("allowance").value);
-      const bills = Number(document.getElementById("bills").value);
-      const weekdaySpend = Number(document.getElementById("weekday-spending").value);
-      const weekendSpend = Number(document.getElementById("weekend-spending").value);
-      const startDate = new Date(startDateInput.value + "T00:00:00");
-
-      if (bills > allowance) {
-        alert("Your recurring bills cannot be greater than your allowance.");
-        return;
-      }
-
-      showCalcPopup();
-
-      try {
-        const [response] = await Promise.all([
-          fetchWithTimeout(`${API_BASE_URL}/api/predict`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              allowance: allowance,
-              bills: bills,
-              daily_spending: (weekdaySpend * 5 + weekendSpend * 2) / 7,
-              weekday_spending: weekdaySpend,
-              weekend_spending: weekendSpend,
-              start_date: startDateInput.value,
-              client_meta: getClientMeta()
-            })
-          }, 10000),
-          new Promise((resolve) => setTimeout(resolve, 1000))
-        ]);
-
-        const apiData = await response.json();
-
-        if (!response.ok) {
-          hideCalcPopup();
-          if (response.status === 503) {
-            applyMaintenanceState(false);
-            return;
-          }
-          alert(apiData.detail || "Prediction error occurred.");
-          return;
-        }
-
-        const balance = apiData.balance;
-        const daysUntilZero = Math.ceil(apiData.predicted_days_left);
-
-        const nextAllowanceDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 1);
-        const daysInCycle = Math.max(1, Math.round((nextAllowanceDate - startDate) / (1000 * 60 * 60 * 24)));
-        const safeDailyBudget = daysInCycle > 0 ? balance / daysInCycle : 0;
-
-        hideCalcPopup();
-
-        animateValue(remainingMoney, 0, balance, 800, true);
-        animateValue(recommendedBudget, 0, safeDailyBudget, 800, true);
-
-        if (daysUntilZero <= daysInCycle) {
-          animateValue(daysLeft, 0, daysUntilZero, 800, false);
-        } else {
-          daysLeft.textContent = "Safe Cycle";
-        }
-
-        document.getElementById("peer-rank-display").textContent = apiData.peer_rank;
-        document.getElementById("risk-score-display").textContent = apiData.risk_score;
-        document.getElementById("risk-percentage-text").textContent = `Model Overspend Risk Probability: ${apiData.risk_percentage}%`;
-
-        setTimeout(() => {
-          document.getElementById("risk-bar").style.width = apiData.risk_percentage + "%";
-        }, 200);
-
-        const mainCard = document.getElementById("main-result-card");
-        if (daysUntilZero <= 5 || balance <= 0) {
-          mainCard.classList.add("danger-pulse");
-        } else {
-          mainCard.classList.remove("danger-pulse");
-        }
-
-        const weightedDaily = (weekdaySpend * 5 + weekendSpend * 2) / 7;
-        const estimatedMonthlyBurn = weightedDaily * 30;
-        document.getElementById("pred-monthly-burn").textContent = formatMoney(estimatedMonthlyBurn);
-        document.getElementById("pred-weekend-cap").textContent = formatMoney(safeDailyBudget * 1.3) + " / day";
-
-        const surplusDeficitVal = balance - estimatedMonthlyBurn;
-        const surplusElem = document.getElementById("pred-surplus-deficit");
-        surplusElem.textContent = formatMoney(surplusDeficitVal);
-        surplusElem.style.color = surplusDeficitVal >= 0 ? "#2ed573" : "#ff4757";
-
-        if (balance <= 0) {
-          zeroDate.textContent = formatDate(startDate);
-          resultMessage.textContent = "Your bills consumed your entire allowance. Financial disaster on day one!";
-          survivalMessage.textContent = "Zero spendable balance left—stick strictly to mess/basic essentials.";
-          budgetAdvice.textContent = "Consider lowering fixed monthly commitments or tracking small recurring charges.";
-        } else {
-          if (daysUntilZero <= daysInCycle) {
-            const depletionDate = addDays(startDate, Math.max(0, daysUntilZero - 1));
-            zeroDate.textContent = formatDate(depletionDate);
-            resultMessage.textContent = `At your split burn rate (${formatMoney(apiData.effective_daily_spending)}/day), funds hit zero in ${daysUntilZero} days.`;
-            survivalMessage.textContent = "Your daily burn rate will run out before the month ends. Trim weekend outings and impulse snacks.";
-            budgetAdvice.textContent = `Keep average daily spend at or below ${formatMoney(safeDailyBudget)} to make it to ${formatDate(nextAllowanceDate)}.`;
-          } else {
-            zeroDate.textContent = "You survived! 🥳";
-            resultMessage.textContent = `Congratulations! Forecast predicts survival until your next credit on ${formatDate(nextAllowanceDate)}.`;
-            survivalMessage.textContent = "Your spending habits are well balanced for this cycle!";
-            budgetAdvice.textContent = `You have room to stay around ${formatMoney(safeDailyBudget)}/day while keeping a buffer.`;
-          }
-        }
-
-        results.classList.remove("hidden");
-        results.scrollIntoView({ behavior: "smooth", block: "start" });
-
-      } catch (err) {
-        hideCalcPopup();
-        console.error("API error:", err);
-        alert(`Failed to connect to FastAPI backend at ${API_BASE_URL}. Please try again in a few seconds if Render is waking up.`);
-      }
-    });
-
-    resetButton.addEventListener("click", function() {
-      form.reset();
-      startDateInput.value = formatDateForInput(firstDay);
-      document.getElementById("risk-bar").style.width = "0%";
-      results.classList.add("hidden");
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
-  </script>
+/* ---------- quick reality check ---------- */
+(function () {
+  const a = document.getElementById("qa"), d = document.getElementById("qd");
+  const out = document.getElementById("qtxt"), bar = document.getElementById("qbar");
+  const inr = (n) => "₹" + Math.round(n).toLocaleString("en-IN");
+  function upd() {
+    const A = +a.value, D = +d.value, days = A / D;
+    document.getElementById("qav").textContent = inr(A);
+    document.getElementById("qdv").textContent = inr(D);
+    bar.style.width = Math.min(days / 30, 1) * 100 + "%";
+    bar.style.background = days >= 30 ? "#16a34a" : days >= 20 ? "#ffb020" : "#ff5a4e";
+    out.textContent = days >= 30
+      ? `You'd get through a 30-day month with about ${inr(A - D * 30)} to spare.`
+      : `Your money lasts about ${Math.floor(days)} days. The last ${30 - Math.floor(days)} days are noodle days.`;
+  }
+  a.addEventListener("input", upd); d.addEventListener("input", upd); upd();
+})();
+</script>
 </body>
 </html>
